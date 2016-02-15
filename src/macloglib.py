@@ -5,8 +5,8 @@ import os
 def ensure_dir(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
-        os.makedirs(d)    
-        
+        os.makedirs(d)
+
 def setup_custom_logger(dir_name='./',filename='MAC.log'):
     ensure_dir(dir_name)
     formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
@@ -17,7 +17,7 @@ def setup_custom_logger(dir_name='./',filename='MAC.log'):
     handler.setFormatter(formatter)
     fileHandler.setFormatter(formatter)
 
-    logger = logging.getLogger()
+    logger = logging.getLogger(dir_name)
     logger.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     logger.addHandler(fileHandler)
@@ -47,7 +47,7 @@ def log_model(logger,model):
     E = model.E
     Prm = model.Prm
     l1 = model.l1
-    
+
     logger.info(
     '\nMAC model, m={0}, Nk={1}, Nl={2}\n'.format(m,Nk,Nl)
     +'\nPhysical Parameters\n'
@@ -85,6 +85,6 @@ def log_model(logger,model):
     +'\nLorentz Equation Terms\n'
     +'lambda*b ~ l1 = {0:.2e}\n'.format(l1)
     +'dr uxB ~ Bd/dr = {0:.2e}\n'.format(u_star*Bd/dr)
-    +'E/Prm/dr^2 ~ {0:.2e}\n'.format(E/Prm/dr**2) 
+    +'E/Prm/dr^2 ~ {0:.2e}\n'.format(E/Prm/dr**2)
     )
 

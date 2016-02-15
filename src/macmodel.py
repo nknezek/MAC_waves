@@ -1,6 +1,5 @@
 import numpy as np
-import scipy
-import scipy.sparse as sparse
+import scipy.sparse
 from numpy import sin
 from numpy import cos
 import sys
@@ -10,13 +9,15 @@ from petsc4py import PETSc
 from slepc4py import SLEPc
 opts = PETSc.Options()
 import cPickle as pkl
-import copy
+
 
 class Model():
-    def __init__(self, model_variables, boundary_variables, 
+    def __init__(self, model_variables, boundary_variables,
                  model_parameters, physical_constants):
         self.model_variables = model_variables
         self.boundary_variables = boundary_variables
+        self.model_parameters = model_parameters
+        self.physical_constants = physical_constants
 
         for key in model_parameters:
             exec('self.'+str(key)+' = model_parameters[\''+str(key)+'\']')
@@ -42,58 +43,171 @@ class Model():
         self.rmin = (self.R-self.h)/self.r_star
         self.rmax = self.R/self.r_star
         self.dr = (self.rmax-self.rmin)/(self.Nk)
-        self.r = np.linspace(self.rmin-self.dr/2.,self.rmax+self.dr/2.,num=self.Nk+2.) # r value at center of each cell
-        self.rm = np.linspace(self.rmin-self.dr,self.rmax,num=self.Nk+2.) # r value at plus border (top) of cell
-        self.rp = np.linspace(self.rmin,self.rmax+self.dr,num=self.Nk+2.) # r value at minus border (bottom) of cell
+        self.r = np.linspace(self.rmin-self.dr/2., self.rmax+self.dr/2.,num=self.Nk+2.) # r value at center of each cell
+        self.rm = np.linspace(self.rmin-self.dr, self.rmax, num=self.Nk+2.) # r value at plus border (top) of cell
+        self.rp = np.linspace(self.rmin, self.rmax+self.dr, num=self.Nk+2.) # r value at minus border (bottom) of cell
         self.dth = np.pi/(self.Nl)
-        self.th = np.linspace(-self.dth/2.,np.pi+self.dth/2.,num=self.Nl+2.) # theta value at center of cell
-        self.thm = np.linspace(-self.dth,np.pi,num=self.Nl+2.) # theta value at plus border (top) of cell
-        self.thp = np.linspace(0,np.pi+self.dth,num=self.Nl+2.)
+        self.th = np.linspace(-self.dth/2., np.pi+self.dth/2., num=self.Nl+2.) # theta value at center of cell
+        self.thm = np.linspace(-self.dth, np.pi, num=self.Nl+2.) # theta value at plus border (top) of cell
+        self.thp = np.linspace(0,np.pi+self.dth, num=self.Nl+2.)
         return None
-    
+
     def calculate_nondimensional_parameters(self):
         """
-        Calculates the non-dimensional parameters in model from the physical constants.
+        Calculates the non-dimensional parameters in model from the physical
+        constants.
         """
         self.t_star = 1/self.Omega  # seconds
         self.r_star = self.R  # meters
-        self.P_star = self.rho* self.r_star**2/self.t_star**2
+        self.P_star = self.rho*self.r_star**2/self.t_star**2
         self.B_star = (self.eta*self.mu_0*self.rho/self.t_star)**0.5
         self.u_star = self.r_star/self.t_star
         self.E = self.nu*self.t_star/self.r_star**2
         self.Prm = self.nu/self.eta
+        self.Eth = self.nu_th*self.t_star/self.r_star**2
+        self.Eth_Prmth = self.eta_th*self.t_star/self.r_star**2
         return None
-    
-    def set_Br(self,Br):
-        """ Sets the backgound magnetic field in Tesla"""
-        self.Br = Br
-        self.B0 = self.Br/self.B_star
+
+    def set_Br(self, BrT):
+        """ Sets the backgound magnetic field in Tesla
+        BrT = Br values for each cell in Tesla"""
+        self.BrT = BrT
+        self.Br = self.BrT/self.B_star
         return None
-    
-    def set_dipole_Br(self,Bd):
+
+    def set_Bth(self, BthT):
+        """ Sets the background theta magnetic field in Tesla
+        BthT = Bth values for each cell in Tesla"""
+        self.BthT = BthT
+        self.Bth = self.BthT/self.B_star
+
+    def set_Br_dipole(self, Bd, const=0):
+        """ Sets the background magnetic field to a dipole field with
+        Bd = dipole constant in Tesla """
         self.Bd = Bd
-        self.Br = np.ones((self.Nk+2,self.Nl+2))*cos(self.th)*Bd
-        self.B0 = self.Br/self.B_star
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)*Bd + const
+        self.Br = self.BrT/self.B_star
+        self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
+        self.Bth = self.BthT/self.B_star
         return None
-        
-    def set_Uphi(self,Uphi):
+
+    def set_B_dipole(self, Bd, const=0):
+        """ Sets the background magnetic field to a dipole field with
+        Bd = dipole constant in Tesla """
+        self.Bd = Bd
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)*Bd + const
+        self.Br = self.BrT/self.B_star
+        self.BthT = np.ones((self.Nk+2, self.Nl+2))*sin(self.th)*Bd + const
+        self.Bth = self.BthT/self.B_star
+        return None
+
+    def set_B_abs_dipole(self, Bd, const=0):
+        """ Sets the background magnetic Br and Bth field to the absolute value of a
+        dipole field with Bd = dipole constant in Tesla """
+        self.Bd = Bd
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
+        self.Br = self.BrT/self.B_star
+        self.BthT = np.ones((self.Nk+2, self.Nl+2))*abs(sin(self.th))*Bd + const
+        self.Bth = self.BthT/self.B_star
+        return None
+
+    def set_B_dipole_absrsymth(self, Bd, const=0):
+        """ Sets the background magnetic Br and Bth field to the absolute value of a
+        dipole field with Bd = dipole constant in Tesla """
+        self.Bd = Bd
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
+        self.Br = self.BrT/self.B_star
+        self.BthT = np.ones((self.Nk+2, self.Nl+2))*sin(self.th)*Bd + const
+        self.Bth = self.BthT/self.B_star
+        return None
+
+    def set_Br_abs_dipole(self, Bd, const=0):
+        """ Sets the background Br magnetic field the absolute value of a
+        dipole with Bd = dipole constant in Tesla"""
+        self.Bd = Bd
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
+        self.Br = self.BrT/self.B_star
+        self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
+        self.Bth = self.BthT/self.B_star
+        return None
+
+    def set_Br_sinfunc(self, Bmin, Bmax, sin_exp=2.5):
+        self.BrT = np.ones((self.Nk+2, self.Nl+2))*((1-sin(self.th)**sin_exp)*(Bmax-Bmin)+Bmin)
+        self.Br = self.BrT/self.B_star
+        self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
+        self.Bth = self.BthT/self.B_star
+        return None
+
+    def set_B_by_type(self, B_type, Bd=0.0, Br=0.0, Bth=0.0, const=0.0, Bmin=0.0, Bmax=0.0, sin_exp=2.5):
+        """ Sets the background magnetic field to given type.
+        B_type choices:
+            dipole : Br, Bth dipole; specify scalar dipole constant Bd (T)
+            abs_dipole : absolute value of dipole in Br and Bth, specify scalar Bd (T)
+            dipole_Br : Br dipole, Bth=0; specify scalar dipole constant Bd (T)
+            abs_dipole_Br : absolute value of dipole in Br, specify scalar Bd (T)
+            constant_Br : constant Br, Bth=0; specify scalar Br (T)
+            set : specify array Br and Bth values in (T)
+            dipole_absrsymth : absolute value of dipole in Br, symmetric in Bth, specify scalar Bd (T)
+        """
+        if B_type == 'dipole':
+            self.set_B_dipole(Bd, const=const)
+        elif B_type == 'dipole_Br':
+            self.set_Br_dipole(Bd, const=const)
+        elif B_type == 'constant_Br':
+            self.set_Br(Br*np.ones((self.Nk+2, self.Nl+2)))
+            self.set_Bth(0.0*np.ones((self.Nk+2, self.Nl+2)))
+        elif B_type == 'set':
+            self.set_Br(Br)
+            self.set_Bth(Bth)
+        elif B_type == 'abs_dipole_Br':
+            self.set_Br_abs_dipole(Bd, const=const)
+        elif B_type == 'abs_dipole':
+            self.set_B_abs_dipole(Bd, const=const)
+        elif B_type == 'dipole_absrsymth':
+            self.set_B_dipole_absrsymth(Bd, const=const)
+        elif B_type == 'Br_sinfunc':
+            self.set_Br_sinfunc(Bmin, Bmax, sin_exp=sin_exp)
+        else:
+            raise Exception('B_type not valid')
+
+    def set_CC_skin_depth(self, period):
+        """ sets the magnetic skin depth for conducting core BC
+        inputs:
+            period = period of oscillation in years
+        returns:
+            delta_C = skin depth in (m)
+        """
+        self.delta_C = np.sqrt(2*self.eta/(2*np.pi/(period*365.25*24*3600)))
+        self.physical_constants['delta_C'] = self.delta_C
+        return self.delta_C
+
+    def set_Uphi(self, Uphi):
         """Sets the background velocity field in m/s"""
         self.Uphi = Uphi
         self.U0 = self.Uphi*self.r_star/self.t_star
         return None
-    
-    def set_buoyancy(self,drho_dr):
+
+    def set_buoyancy(self, drho_dr):
         """Sets the buoyancy structure of the layer"""
         self.omega_g = np.sqrt(-self.g/self.rho*drho_dr)
         self.G = self.omega_g**2*self.t_star**2
-        
-    def get_index(self, k, l, *args):
+
+    def set_buoy_by_type(self, buoy_type, buoy_ratio):
+        self.omega_g0 = buoy_ratio*self.Omega
+        if buoy_type == 'constant':
+            self.omega_g = np.ones((self.Nk+2, self.Nl+2))*self.omega_g0
+        elif buoy_type == 'linear':
+            self.omega_g = (np.ones((self.Nk+2, self.Nl+2)).T*np.linspace(0, self.omega_g0, self.Nk+2)).T
+        self.G = self.omega_g**2*self.t_star**2
+
+    def get_index(self, k, l, var):
         """
         Takes coordinates for a point, gives back index in matrix.
         inputs:
-            k: k grid value from 1 to K (or 0 to K+1 for variables with ghost points)
+            k: k grid value from 1 to K (or 0 to K+1 for variables with
+                boundary conditions)
             l: l grid value from 1 to L
-            var: 'ur', 'uth', 'uph', or 'p'
+            var: variable name in model_variables
         outputs:
             index of location in matrix
         """
@@ -103,20 +217,8 @@ class Model():
         SizeMnoBC = self.SizeMnoBC
         Size_var = self.Size_var
 
-        if len(args) > 2 or len(args) < 1:
-            raise RuntimeError('incorrect number of arguments passed')
-        else:
-            if len(args) == 1:
-                m = self.m_values[0]
-                var = args[0]
-            elif len(args) == 2:
-                m = args[0]
-                var = args[1]
-
         if (var not in self.model_variables):
             raise RuntimeError('variable not in model_variables')
-        elif m not in self.m_values:
-            raise RuntimeError('m not in modes to simulate')
         elif not (l >= 1 and l <= Nl):
             raise RuntimeError('l index out of bounds')
         elif not ((k >= 1 and k <= Nk) or ((k == 0 or k == Nk+1) and var in
@@ -128,14 +230,12 @@ class Model():
                     k_bound = 0
                 elif k == Nk+1:
                     k_bound = 1
-                return self.m_values.index(m)*SizeM + SizeMnoBC +\
-                    Nl*2*self.boundary_variables.index(var) + k_bound*Nl +\
-                    (l-1)
+                return SizeMnoBC + Nl*2*self.boundary_variables.index(var) +\
+                    k_bound*Nl + (l-1)
             else:
-                return self.m_values.index(m)*SizeM + \
-                    Size_var*self.model_variables.index(var) + (k-1) + (l-1)*Nk
+                return Size_var*self.model_variables.index(var) + (k-1) + (l-1)*Nk
 
-    def get_variable(self, vector, var, *args):
+    def get_variable(self, vector, var, returnBC=True):
         """
         Takes a flat vector and a variable name, returns the variable in a
         np.matrix and the bottom and top boundary vectors
@@ -148,33 +248,29 @@ class Model():
         """
         Nk = self.Nk
         Nl = self.Nl
-        if len(args) > 1 or len(args) < 0:
-            raise RuntimeError('incorrect number of arguments passed')
-        else:
-            if len(args) == 0:
-                m = self.m_values[0]
-            elif len(args) == 1:
-                m = args[0]
+
         if (var not in self.model_variables):
             raise RuntimeError('variable not in model_variables')
         elif len(vector) != self.SizeM:
             raise RuntimeError('vector given is not correct length in this \
                                model')
-
         else:
-            var_start = self.get_index(1, 1, m, var)
-            var_end = self.get_index(Nk, Nl, m, var)+1
-            variable = np.reshape(vector[var_start:var_end], (Nk, Nl), 'F')
+            var_start = self.get_index(1, 1, var)
+            var_end = self.get_index(Nk, Nl, var)+1
+            variable = np.array(np.reshape(vector[var_start:var_end], (Nk, Nl), 'F'))
             if var in self.boundary_variables:
-                bound_bot_start = self.get_index(0, 1, m, var)
-                bound_bot_end = self.get_index(0, Nl, m, var)+1
-                bound_top_start = self.get_index(Nk+1, 1, m, var)
-                bound_top_end = self.get_index(Nk+1, Nl, m, var)+1
-                bottom_boundary = np.reshape(vector[bound_bot_start:
-                                             bound_bot_end], (1, Nl))
-                top_boundary = np.reshape(vector[bound_top_start:
-                                                 bound_top_end], (1, Nl))
-                return variable, bottom_boundary, top_boundary
+                bound_bot_start = self.get_index(0, 1, var)
+                bound_bot_end = self.get_index(0, Nl, var)+1
+                bound_top_start = self.get_index(Nk+1, 1, var)
+                bound_top_end = self.get_index(Nk+1, Nl, var)+1
+                bottom_boundary = np.array(np.reshape(vector[bound_bot_start:
+                                             bound_bot_end], (1, Nl)))
+                top_boundary = np.array(np.reshape(vector[bound_top_start:
+                                                 bound_top_end], (1, Nl)))
+                if returnBC:
+                    return variable, bottom_boundary, top_boundary
+                else:
+                    return variable
             else:
                 return variable
 
@@ -198,7 +294,6 @@ class Model():
             raise RuntimeError('Incorrect number of variable vectors passed')
         if len(boundaries) != len(self.boundary_variables):
             raise RuntimeError('Incorrect number of boundary vectors passed')
-
         for var in variables:
             vector = np.vstack((vector, np.reshape(var, (Nk*Nl, 1))))
         for bound in boundaries:
@@ -231,76 +326,41 @@ class Model():
             vecs.append(ws.getArray())
         return vals, vecs
 
-#    def convert_A_SLEPc(self):
-#        """ Converts the scipy sparse A matrix to PETSc format"""
-#        try:
-#            self.A
-#        except NameError:
-#            self.A = self.make_A()
-#
-#        # Set up A matrix
-#        self.A_SLEPc = PETSc.Mat().createAIJ([self.SizeM,  self.SizeM])
-#        self.A_SLEPc.setType(PETSc.Mat.Type.AIJ)
-#        self.A_SLEPc.setUp()
-#        for key,  val in self.A.todok().iteritems():
-#            self.A_SLEPc[key[0],  key[1]] = val
-#        self.A_SLEPc.assemble()
-#        return self.A_SLEPc
-#
-#    def convert_M_SLEPc(self, epsilon=1e-7):
-#        """ Converts the scipy sparse M matrix to PETSc format"""
-#        try:
-#            self.M
-#        except NameError:
-#            self.M = self.make_M()
-#        # Set up M matrix
-#        self.M_SLEPc = PETSc.Mat().createAIJ([self.SizeM,  self.SizeM])
-#        self.M_SLEPc.setType(PETSc.Mat.Type.AIJ)
-#        self.M_SLEPc.setUp()
-#        for key,  val in self.M.todok().iteritems():
-#            self.M_SLEPc[key[0],  key[1]] = val
-#        # If any diagnoal elements are zero, replace with epsilon
-#        for ind in range(self.SizeM):
-#            if self.M[ind, ind] == 0.:
-#                self.M_SLEPc[ind, ind] = epsilon
-#        self.M_SLEPc.assemble()
-#        return self.M_SLEPc
-        
     def save_mat_PETSc(self, filename, mat, type='Binary'):
         """ Saves a Matrix in PETSc format """
         if type == 'Binary':
-            viewer = PETSc.Viewer().createBinary(filename,'w')
+            viewer = PETSc.Viewer().createBinary(filename, 'w')
         elif type == 'ASCII':
-            viewer = PETSc.Viewer().createASCII(filename,'w')
+            viewer = PETSc.Viewer().createASCII(filename, 'w')
         viewer(mat)
 
     def load_mat_PETSc(self, filename, type='Binary'):
         """ Loads and returns a Matrix stored in PETSc format """
         if type == 'Binary':
-            viewer = PETSc.Viewer().createBinary(filename,'r')
+            viewer = PETSc.Viewer().createBinary(filename, 'r')
         elif type == 'ASCII':
-            viewer = PETSc.Viewer().createASCII(filename,'r')
+            viewer = PETSc.Viewer().createASCII(filename, 'r')
         return PETSc.Mat().load(viewer)
 
     def save_vec_PETSc(self, filename, vec, type='Binary'):
         """ Saves a vector in PETSc format """
         if type == 'Binary':
-            viewer = PETSc.Viewer().createBinary(filename,'w')
+            viewer = PETSc.Viewer().createBinary(filename, 'w')
         elif type == 'ASCII':
-            viewer = PETSc.Viewer().createASCII(filename,'w')
+            viewer = PETSc.Viewer().createASCII(filename, 'w')
         viewer(vec)
 
     def load_vec_PETSc(self, filename, type='Binary'):
         """ Loads and returns a vector stored in PETSc format """
         if type == 'Binary':
-            viewer = PETSc.Viewer().createBinary(filename,'r')
+            viewer = PETSc.Viewer().createBinary(filename, 'r')
         elif type == 'ASCII':
-            viewer = PETSc.Viewer().createASCII(filename,'r')
+            viewer = PETSc.Viewer().createASCII(filename, 'r')
         return PETSc.Mat().load(viewer)
-        
+
     def save_model(self, filename):
         """ Saves the model structure without the computed A and M matrices"""
-        try: 
+        try:
             self.A
         except:
             pass
@@ -315,7 +375,7 @@ class Model():
             M = self.M
             del self.M
 
-        pkl.dump(self, open(filename,'wb'))
+        pkl.dump(self, open(filename, 'wb'))
 
         try:
             A
@@ -330,6 +390,61 @@ class Model():
         else:
             self.M = M
 
+    def make_D3sqMat(self):
+        self.D3sq_rows = []
+        self.D3sq_cols = []
+        self.D3sq_vals = []
+        for var in self.boundary_variables:
+            self.add_gov_equation('D3sq_'+var, var)
+            exec('self.D3sq_'+var+'.add_D3sq(\''+var+'\','+str(self.m)+')')
+            exec('self.D3sq_rows = self.D3sq_'+var+'.rows')
+            exec('self.D3sq_cols = self.D3sq_'+var+'.cols')
+            exec('self.D3sq_vals = self.D3sq_'+var+'.vals')
+        self.D3sqMat = coo_matrix((self.D3sq_vals, (self.D3sq_rows, self.D3sq_cols)),
+                               shape=(self.SizeM, self.SizeM))
+        return self.D3sqMat
+
+    def make_dthMat(self):
+        self.dth_rows = []
+        self.dth_cols = []
+        self.dth_vals = []
+        for var in self.boundary_variables:
+            self.add_gov_equation('dth_'+var, var)
+            exec('self.dth_'+var+'.add_dth(\''+var+'\','+str(self.m)+')')
+            exec('self.dth_rows += self.dth_'+var+'.rows')
+            exec('self.dth_cols += self.dth_'+var+'.cols')
+            exec('self.dth_vals += self.dth_'+var+'.vals')
+        self.dthMat = coo_matrix((self.dth_vals, (self.dth_rows, self.dth_cols)),
+                              shape=(self.SizeM, self.SizeM))
+        return self.dthMat
+
+    def make_dphMat(self):
+        self.dph_rows = []
+        self.dph_cols = []
+        self.dph_vals = []
+        for var in self.boundary_variables:
+            self.add_gov_equation('dth_'+var, var)
+            exec('self.dph_'+var+'.add_dth(\''+var+'\','+str(self.m)+')')
+            exec('self.dph_rows += self.dth_'+var+'.rows')
+            exec('self.dph_cols += self.dth_'+var+'.cols')
+            exec('self.dph_vals += self.dth_'+var+'.vals')
+        self.dthMat = coo_matrix((self.dph_vals, (self.dph_rows, self.dph_cols)),
+                              shape=(self.SizeM, self.SizeM))
+        return self.dphMat
+
+    def make_Bobs(self):
+        BrobsT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)
+        self.Brobs = BrobsT/self.B_star
+        gradBrobsT = -2*np.ones((self.Nk+2, self.Nl+2))*sin(self.th)/self.R
+        self.gradBrobs = gradBrobsT/self.B_star*self.r_star
+        self.add_gov_equation('Bobs', 'ur')
+        self.Bobs.add_term('uth', 'self.model.gradBrobs[k,l]')
+        self.Bobs.add_Dth('uth', 'self.model.Brobs[k,l]')
+        self.Bobs.add_Dph('uph', 'self.model.Brobs[k,l]')
+        self.BobsMat = coo_matrix((self.Bobs.vals, (self.Bobs.rows, self.Bobs.cols)),
+                                  shape=(self.SizeM, self.SizeM))
+        return self.BobsMat
+
 class GovEquation():
     def __init__(self, model, variable):
         self.rows = []
@@ -338,8 +453,22 @@ class GovEquation():
         self.variable = variable
         self.model = model
 
-    def add_term(self, var, value, m, kdiff=0, ldiff=0, mdiff=0, first_l=1,
-                last_l=None, first_k=1, last_k=None):
+    def add_term(self, var, value, kdiff=0, ldiff=0, mdiff=0, k_vals=None,
+                 l_vals=None):
+        ''' Adds a term to the governing equation.
+        By default, iterates over 1 < k < Nk and 1 < l < Nl
+        with kdiff = ldiff = mdiff = 0
+        inputs:
+            str var:     model variable name to input for
+            str value:   string expression to evaluate for value to input
+            int kdiff:   offset to use for k
+            int ldiff:   offset to use for l
+            int mdiff:   offset to use for m
+            list k_vals: list of int k values to iterate over
+            list l_vals: list of int l values to iterate over
+        output:
+            none
+        '''
         dr = self.model.dr
         r = self.model.r
         rp = self.model.rp
@@ -348,48 +477,48 @@ class GovEquation():
         th = self.model.th
         thm = self.model.thm
         thp = self.model.thp
-
         Nk = self.model.Nk
         Nl = self.model.Nl
-
         E = self.model.E
         Prm = self.model.Prm
         G = self.model.G
-
-        B0 = self.model.B0
+        Br = self.model.Br
+        Bth = self.model.Bth
         U0 = self.model.U0
+        m = self.model.m
+        Eth = self.model.Eth
+        Eth_Prmth = self.model.Eth_Prmth
 
-        if last_l is None:
-            last_l = Nl
-        if last_k is None:
-            last_k = Nk
+        if l_vals is None:
+            l_vals = range(1, Nl+1)
+        if k_vals is None:
+            k_vals = range(1, Nk+1)
 
         # Check Inputs:
-        if first_l > Nl or first_l < 1:
-            raise RuntimeError('first_l out of bounds')
-        if last_l > Nl or last_l < 1:
-            raise RuntimeError('last_l out of bounds')
-        if first_k > Nk+1 or first_k < 0:
-            raise RuntimeError('first_k out of bounds')
-        if last_k > Nk+1 or last_k < 0:
-            raise RuntimeError('last_k out of bounds')
         if var not in self.model.model_variables:
             raise RuntimeError('variable not in model')
 
-        for l in range(first_l, last_l+1):
-            for k in range(first_k, last_k+1):
-                try:
-                    value_computed = eval(value, globals(), locals())
-                except:
-                    raise RuntimeError('Problem evaluating term')
-                if not np.isclose(value_computed, 0.0, atol=Nl*1E-12,
-                                  rtol=Nl*1E-12):
+        for l in l_vals:
+            for k in k_vals:
+                if l > Nl or l < 1:
+                    raise RuntimeError('l out of bounds')
+                if k > Nk+1 or k < 0:
+                    raise RuntimeError('k out of bounds')
+                if type(value) in (int, complex, float):
+                    value_computed = value
+                else:
+                    try:
+                        value_computed = eval(value, globals(), locals())
+                    except:
+                        import ipdb; ipdb.set_trace()
+                        raise RuntimeError('Problem evaluating term')
+
+                if not ((l+ldiff <= 0) or (l+ldiff >= Nl+1) or value_computed == 0.0):
                     self.rows.append(self.model.get_index(k, l, self.variable))
-                    self.cols.append(self.model.get_index(k+kdiff, l+ldiff,
-                                     var))
+                    self.cols.append(self.model.get_index(k+kdiff, l+ldiff, var))
                     self.vals.append(value_computed)
 
-    def add_bc(self, var, value, k, m, kdiff=0, first_l=1, last_l=None):
+    def add_bc(self, var, value, k, kdiff=0, k_vals=None, l_vals=None):
         dr = self.model.dr
         r = self.model.r
         rp = self.model.rp
@@ -398,24 +527,23 @@ class GovEquation():
         th = self.model.th
         thm = self.model.thm
         thp = self.model.thp
-
         Nk = self.model.Nk
         Nl = self.model.Nl
-
         E = self.model.E
         Prm = self.model.Prm
         G = self.model.G
-
-        B0 = self.model.B0
+        Br = self.model.Br
+        Bth = self.model.Bth
         U0 = self.model.U0
+        m = self.model.m
 
-        if last_l is None:
-            last_l = Nl
+        if l_vals is None:
+            l_vals = range(1, Nl+1)
 
         if var not in self.model.boundary_variables:
             raise RuntimeError('variable is not in boundary_variables')
 
-        for l in range(first_l, last_l+1):
+        for l in l_vals:
             self.rows.append(self.model.get_index(k, l, var))
             self.cols.append(self.model.get_index(k+kdiff, l, var))
             self.vals.append(eval(value, globals(), locals()))
@@ -431,58 +559,76 @@ class GovEquation():
         self.cols.append(self.model.get_index(col['k'], col['l'], col['var']))
         self.vals.append(eval(value, globals(), locals()))
 
-    def add_Dr(self, var, m, const=1.):
-        self.add_term(var, str(const)+'*+(rp[k]/r[k])**2.0 / (2.0*dr)', m,
-                      kdiff=+1)
-        self.add_term(var, str(const)+'*-(rm[k]/r[k])**2.0 / (2.0*dr)', m,
-                      kdiff=-1)
+    def add_Dr(self, var, const=1., k_vals=None, l_vals=None):
+        self.add_term(var, str(const)+'*+(rp[k]/r[k])**2.0 / (2.0*dr)',
+                      kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, str(const)+'*-(rm[k]/r[k])**2.0 / (2.0*dr)',
+                      kdiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, str(const)+'*-(sin(thp[l])/sin(th[l]))/(4.0*r[k])',
-                      m, ldiff=+1)
+                      ldiff=+1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, str(const)+'*-(sin(thm[l])/sin(th[l]))/(4.0*r[k])',
-                      m, ldiff=-1)
+                      ldiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, str(const) +
-                      '*-(sin(thp[l])+sin(thm[l]))/(4.0*r[k]*sin(th[l]))', m)
+                      '*-(sin(thp[l])+sin(thm[l]))/(4.0*r[k]*sin(th[l]))',
+                      k_vals=k_vals, l_vals=l_vals)
 
-    def add_Dth(self, var, m, const=1):
+    def add_Dth(self, var, const=1, k_vals=None, l_vals=None):
         self.add_term(var, str(const) +
-                     '*+(sin(thp[l])/sin(th[l]))/(2.0*r[k]*dth)', m, ldiff=+1)
+                      '*+(sin(thp[l])/sin(th[l]))/(2.0*r[k]*dth)', ldiff=+1,
+                      k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, str(const) +
-                     '*-(sin(thm[l])/sin(th[l]))/(2.0*r[k]*dth)', m, ldiff=-1)
+                      '*-(sin(thm[l])/sin(th[l]))/(2.0*r[k]*dth)', ldiff=-1,
+                      k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, str(const) +
-                     '*((sin(thp[l])-sin(thm[l]))/(2.0*dth) -\
-                     cos(th[l]))/(r[k]*sin(th[l]))', m)
+                      '*((sin(thp[l])-sin(thm[l]))/(2.0*dth) -\
+                      cos(th[l]))/(r[k]*sin(th[l]))', k_vals=k_vals,
+                      l_vals=l_vals)
 
-    def add_Dph(self, var, m, const=1):
-        self.add_term(var, str(const)+'*1j*m/(r[k]*sin(th[l]))', m)
+    def add_Dph(self, var, const=1, k_vals=None, l_vals=None):
+        self.add_term(var, str(const)+'*1j*m/(r[k]*sin(th[l]))')
 
-    def add_dr(self, var, m, const=1.):
-        self.add_term(var, str(const)+'*rp[k]**2/(2*r[k]**2*dr)', m, kdiff=+1)
-        self.add_term(var, str(const)+'*-(rm[k]**2)/(2*r[k]**2*dr)', m,
-                     kdiff=-1)
-        self.add_term(var, str(const)+'*1/r[k]', m)
+    def add_dr(self, var, const=1., k_vals=None, l_vals=None):
+        self.add_term(var, str(const)+'*rp[k]**2/(2*r[k]**2*dr)', kdiff=+1,
+                      k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, str(const)+'*-(rm[k]**2)/(2*r[k]**2*dr)',
+                      kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, str(const)+'*1/r[k]', k_vals=k_vals,
+                      l_vals=l_vals)
 
-    def add_dth(self, var, m, const=1.):
+    def add_dth(self, var, const=1., k_vals=None, l_vals=None):
         self.add_term(var, str(const)+'*sin(thp[l])/(2*sin(th[l])*r[k]*dth)',
-                     m, ldiff=+1)
+                      ldiff=+1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, str(const)+'*-sin(thm[l])/(2*sin(th[l])*r[k]*dth)',
-                     m, ldiff=-1)
+                      ldiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, str(const) +
-                     '*(sin(thp[l])-sin(thm[l]))/(2*sin(th[l])*r[k]*dth)', m)
+                      '*(sin(thp[l])-sin(thm[l]))/(2*sin(th[l])*r[k]*dth)',
+                      k_vals=k_vals, l_vals=l_vals)
 
-    def add_dph(self, var, m, const=1.):
-        self.add_term(var, str(const)+'*1j*m/(r[k]*sin(th[l]))', m)
+    def add_dph(self, var, const=1., k_vals=None, l_vals=None):
+        self.add_term(var, str(const)+'*1j*m/(r[k]*sin(th[l]))',
+                      k_vals=k_vals, l_vals=l_vals)
 
-    def add_D3sq(self, var, m, const=1.):
-        self.add_term(var, str(const)+'*(rp[k]/(r[k]*dr))**2', m, kdiff=+1)
-        self.add_term(var, str(const)+'*(rm[k]/(r[k]*dr))**2', m, kdiff=-1)
+    def add_dthsq(self, var, const=1., k_vals=None, l_vals=None):
+        self.add_term(var, str(const)+'*-(sin(thp[l])+sin(thm[l]))/(sin(th[l])*r[k]**2*dth**2)', k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, str(const)+'*sin(thp[l])/(sin(th[l])*r[k]**2*dth**2)', ldiff=+1, k_vals=k_vals,
+                      l_vals=l_vals)
+        self.add_term(var, str(const)+'*sin(thm[l])/(sin(th[l])*r[k]**2*dth**2)', ldiff=-1, k_vals=k_vals,
+                      l_vals=l_vals)
+
+    def add_D3sq(self, var, const=1., k_vals=None, l_vals=None):
+        self.add_term(var, str(const)+'*(rp[k]/(r[k]*dr))**2', kdiff=+1,
+                      k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, str(const)+'*(rm[k]/(r[k]*dr))**2', kdiff=-1,
+                      k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, str(const)+'*sin(thp[l])/(sin(th[l])*r[k]**2*dth**2)',
+                      ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, str(const)+'*sin(thm[l])/(sin(th[l])*r[k]**2*dth**2)',
+                      ldiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, str(const) +
-                     '*sin(thp[l])/(sin(th[l])*r[k]**2*dth**2)', m, ldiff=+1)
-        self.add_term(var, str(const) +
-                     '*sin(thm[l])/(sin(th[l])*r[k]**2*dth**2)', m, ldiff=-1)
-        self.add_term(var, str(const) +
-                     '*((-rp[k]**2-rm[k]**2)/(r[k]**2*dr**2) -\
-                     (sin(thp[l])+sin(thm[l]))/(sin(th[l])*r[k]**2*dth**2) -\
-                     m**2/(r[k]**2*sin(th[l])**2))', m)
+                      '*((-rp[k]**2-rm[k]**2)/(r[k]**2*dr**2) -\
+                      (sin(thp[l])+sin(thm[l]))/(sin(th[l])*r[k]**2*dth**2) -\
+                      m**2/(r[k]**2*sin(th[l])**2))', k_vals=k_vals,
+                      l_vals=l_vals)
 
     def get_coo_matrix(self):
         return coo_matrix((self.vals, (self.rows, self.cols)),
@@ -498,67 +644,75 @@ class GovEquation():
 
 class csr_matrix(scipy.sparse.csr.csr_matrix):
     """ Subclass to allow conversion to PETSc matrix format"""
-    def toPETSc(self, epsilon=1e-7):
-        # Set up A matrix
-        Mat = PETSc.Mat().createAIJ([self.shape[0],  self.shape[1]])
-        Mat.setType(PETSc.Mat.Type.AIJ)
+    def toPETSc(self, epsilon=1e-12):
+        ind = self.nonzero()
+        Mat = PETSc.Mat().createAIJ(size=self.shape)
         Mat.setUp()
-        for key,  val in self.todok().iteritems():
-            Mat[key[0],  key[1]] = val
+        for i, j, val in zip(ind[0], ind[1], self.data):
+            Mat.setValue(i, j, val)
         # If any diagnoal elements are zero, replace with epsilon
-        for ind in range(self.shape[0]):
-            if self[ind, ind] == 0.:
-                Mat[ind, ind] = epsilon
+        for ind, val in enumerate(self.diagonal()):
+            if val == 0.:
+                Mat.setValue(ind, ind, epsilon)
         Mat.assemble()
         return Mat
 
     def tocoo(self, copy=True):
         """Overridden method to allow converstion to PETsc matrix
 
-        Original Documentation:        
+        Original Documentation:
         Return a COOrdinate representation of this matrix
 
         When copy=False the index and data arrays are not copied.
         """
         major_dim, minor_dim = self._swap(self.shape)
-
         data = self.data
         minor_indices = self.indices
-
         if copy:
             data = data.copy()
             minor_indices = minor_indices.copy()
-
         major_indices = np.empty(len(minor_indices), dtype=self.indices.dtype)
-
         scipy.sparse.compressed._sparsetools.expandptr(major_dim,
                                                        self.indptr,
                                                        major_indices)
-
         row, col = self._swap((major_indices, minor_indices))
-
         return coo_matrix((data, (row, col)), self.shape)
 
 
 class coo_matrix(scipy.sparse.coo.coo_matrix):
     """ Subclass to allow conversion to PETSc matrix format"""
-    def toPETSc(self, epsilon=1e-7):
-        # Set up A matrix
-        Mat = PETSc.Mat().createAIJ([self.shape[0],  self.shape[1]])
-        Mat.setType(PETSc.Mat.Type.AIJ)
+    def toPETSc(self, epsilon=1e-12):
+        csr_mat = self.tocsr()
+        ind = csr_mat.nonzero()
+        Mat = PETSc.Mat().createAIJ(size=self.shape)
         Mat.setUp()
-        for key,  val in self.todok().iteritems():
-            Mat[key[0],  key[1]] = val
+        for i, j, val in zip(ind[0], ind[1], csr_mat.data):
+            Mat.setValue(i, j, val)
         # If any diagnoal elements are zero, replace with epsilon
-        for ind in range(self.shape[0]):
-            if self[ind, ind] == 0.:
-                Mat[ind, ind] = epsilon
+        for ind, val in enumerate(self.diagonal()):
+            if val == 0.:
+                Mat.setValue(ind, ind, epsilon)
         Mat.assemble()
+        del csr_mat
+        return Mat
+
+    def toPETSc_unassembled(self, epsilon=1e-10):
+        csr_mat = self.tocsr()
+        ind = csr_mat.nonzero()
+        Mat = PETSc.Mat().createAIJ(size=self.shape)
+        Mat.setUp()
+        for i, j, val in zip(ind[0], ind[1], csr_mat.data):
+            Mat.setValue(i, j, val)
+        # If any diagnoal elements are zero, replace with epsilon
+        for ind, val in enumerate(self.diagonal()):
+            if val == 0.:
+                Mat.setValue(ind, ind, epsilon)
+        del csr_mat
         return Mat
 
     def tocsr(self):
         """Overridden method to return csr matrix with toPETsc function
-        
+
         Original Documentation:
         Return a copy of this matrix in Compressed Sparse Row format
 
@@ -584,10 +738,12 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
         else:
             M, N = self.shape
             idx_dtype = scipy.sparse.coo.get_index_dtype((self.row, self.col),
-                                        maxval=max(self.nnz, N))
+                                                         maxval=max(self.nnz,
+                                                                    N))
             indptr = np.empty(M + 1, dtype=idx_dtype)
             indices = np.empty(self.nnz, dtype=idx_dtype)
-            data = np.empty(self.nnz, dtype=scipy.sparse.coo.upcast(self.dtype))
+            data = np.empty(self.nnz,
+                            dtype=scipy.sparse.coo.upcast(self.dtype))
 
             scipy.sparse.coo.coo_tocsr(M, N, self.nnz,
                                        self.row.astype(idx_dtype),
@@ -599,5 +755,4 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
 
             A = csr_matrix((data, indices, indptr), shape=self.shape)
             A.sum_duplicates()
-
             return A
