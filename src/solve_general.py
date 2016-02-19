@@ -40,6 +40,7 @@ plot_robinson = cfg.plot_robinson
 plot_B_obs = cfg.plot_B_obs
 plot_vel = cfg.plot_vel
 target_Q = cfg.target_Q
+tol = cfg.tol
 
 # iterate over parameters that can vary
 iter_param_names = ['data_dir', 'use_initial_guess', 'oscillate']
@@ -60,7 +61,7 @@ for c in combinations:
     oscillate = c['oscillate']
     N = data_dir[41:45]
     H = data_dir[28:32]
-    B = data_dir[57:60]
+    B = data_dir[46:]
     out_dir = out_dir_base + '{0}/{1}/{2}/'.format(N, B, H)
     logger = mlog.setup_custom_logger(dir_name=out_dir, filename='SLEPc.log')
     for T in T_list:
@@ -114,7 +115,7 @@ for c in combinations:
                 V.assemble()
                 EPS.setInitialSpace(V)
             EPS.setWhichEigenpairs(EPS.Which.TARGET_MAGNITUDE)
-#            EPS.setTolerances(1.)
+            EPS.setTolerances(tol)
             EPS.setFromOptions()
             ST = EPS.getST()
             ST.setType(SLEPc.ST.Type.SINVERT)
@@ -137,7 +138,7 @@ for c in combinations:
                 vals.append(v)
                 vecs.append(ws.getArray())
             if savefile:
-                pkl.dump({'vals': vals, 'vecs': vecs},open(out_dir + savefile, 'wb'))
+                pkl.dump({'vals': vals, 'vecs': vecs, 'model':model},open(out_dir + savefile, 'wb'))
                 logger.info('vals and vecs saved to ' + out_dir + savefile)
             Period_max = (2*np.pi/min([x.imag for x in vals]))*model.t_star/(24.*3600.*365.25)
             Period_min = (2*np.pi/max([x.imag for x in vals]))*model.t_star/(24.*3600.*365.25)

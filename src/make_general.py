@@ -2,7 +2,8 @@
 import sys
 import macplotlib as mplt
 import itertools as it
-import types
+import numpy as np
+
 # Import configuration file
 sys.path.append('../config')
 import cfg_general as cfg
@@ -18,6 +19,8 @@ g = cfg.g
 model_variables = cfg.model_variables
 boundary_variables = cfg.boundary_variables
 dir_suf = cfg.dir_suf
+ep = cfg.ep
+
 # create list of all combinations of iteratable parameters
 iter_param_names = ['m', 'Nk', 'Nl', 'h', 'nu', 'eta', 'dCyr', 'B_type', 'Bd', 'Br', 'Bth', 'const', 'Bmax', 'Bmin', 'sin_exp', 'Uphi', 'buoy_type', 'buoy_ratio', 'mac', 'nu_th', 'eta_th']
 iter_params = {}
@@ -56,7 +59,7 @@ for c in combinations:
 
     # Directory name to save model
     dir_name = ('../data/k'+str(Nk) + '_l' + str(Nl) +
-                '_m{1:.0f}_nu{2:.0e}_{3:.0f}km_{7}G{4:.0f}_{6}B{5:.0f}_noCC_asymp_nuth{9:.0e}_etath{10:.0e}{8}/'.format(dCyr, m, nu, h/1e3, buoy_ratio*100., Br*1e5, B_type, buoy_type, dir_suf, nu_th, eta_th))
+                '_m{1:.0f}_nu{2:.0e}_{3:.0f}km_{7}G{4:.0f}_{6}B{5:.0f}{8}/'.format(dCyr, m, nu, h/1e3, buoy_ratio*100., Br*1e5, B_type, buoy_type, dir_suf, nu_th, eta_th))
     filemodel = 'model.p' # name of model in directory
     fileA = 'A' # name of A matrix data
     fileB = 'B' # name of M matrix data
@@ -137,11 +140,13 @@ for c in combinations:
     #===============================================================================
     model.make_B()
     print 'created B matrix'
-    model.save_mat_PETSc(dir_name+fileB+'.dat', model.B.toPETSc())
-    print 'saved PETSc M matrix ' + str(dir_name)
+    epB = np.min(np.abs(model.B.data[np.nonzero(model.B.data)]))*ep
+    model.save_mat_PETSc(dir_name+fileB+'.dat', model.B.toPETSc(epsilon=epB))
+    print 'saved PETSc B matrix ' + str(dir_name)
     model.make_A_noCCBC()
     print 'created A_noCCBC matrix'
     model.set_CC_skin_depth(dCyr)
     model.add_CCBC()
-    model.save_mat_PETSc(dir_name+fileA+str(dCyr)+'.dat', model.A.toPETSc())
+    epA = np.min(np.abs(model.A.data[np.nonzero(model.A.data)]))*ep
+    model.save_mat_PETSc(dir_name+fileA+str(dCyr)+'.dat', model.A.toPETSc(epsilon=epA))
     print 'saved PETSc A matrix for dCyr = {0} to '.format(dCyr) + str(dir_name)

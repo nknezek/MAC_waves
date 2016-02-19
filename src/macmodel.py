@@ -733,11 +733,13 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
                [0, 0, 0, 1]])
 
         """
+        from scipy.sparse.sputils import get_index_dtype
+        
         if self.nnz == 0:
             return csr_matrix(self.shape, dtype=self.dtype)
         else:
             M, N = self.shape
-            idx_dtype = scipy.sparse.coo.get_index_dtype((self.row, self.col),
+            idx_dtype = get_index_dtype((self.row, self.col),
                                                          maxval=max(self.nnz,
                                                                     N))
             indptr = np.empty(M + 1, dtype=idx_dtype)

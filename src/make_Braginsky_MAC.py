@@ -141,7 +141,7 @@ for c in combinations:
     print 'created B matrix'
     epB = np.min(np.abs(model.B.data[np.nonzero(model.B.data)]))*ep
     model.save_mat_PETSc(dir_name+fileB+'.dat', model.B.toPETSc(epsilon=epB))
-    print 'saved PETSc M matrix ' + str(dir_name)
+    print 'saved PETSc B matrix ' + str(dir_name)
     model.make_A_noCCBC()
     print 'created A_noCCBC matrix'
     model.set_CC_skin_depth(dCyr)

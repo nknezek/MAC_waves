@@ -2,7 +2,7 @@
 
 ##### Display and Save 1D Waves with comparison Spherical Harmonics for found Eigenvalues and vector field map ######
 import matplotlib.cm as cm
-from mpl_toolkits.basemap import Basemap
+#from mpl_toolkits.basemap import Basemap
 from numpy import sin
 from numpy import cos
 import numpy as np
@@ -45,105 +45,105 @@ def plot_1D(model,vec,val,m,l):
 #    plt.savefig('./output/m={1}/MAC_Eig{0:.2f}j_m={1}_l={2}_Nk={3}_Nl={4}_E={5:.2e}.png'.format(val.imag,m,l,Nk,Nl,E))
 
 
-def plot_mollyweide(model,vec,val,m,l,v_scale=1.0):
-    E = model.E
-    Nk = model.Nk
-    Nl = model.Nl
-    th = model.th
-    ## Calculate vector field and contour field for plotting with basemap
-    ## Create full vector grid in theta and phi
-    u_1D = model.get_variable(vec,'uph')[0][0]
-    v_1D = model.get_variable(vec,'uth')[0][0]
-    Nph = 2*Nl
-    ph = np.linspace(-180.,180.-360./Nph,Nph)
-    lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
-    v = ((np.exp(1j*m*lon_grid*np.pi/180.).T*v_1D).T).real
-    u = ((np.exp(1j*m*lon_grid*np.pi/180.).T*u_1D).T).real
-    absu=u.real**2 + v.real**2
-    Nvec = np.floor(Nl/20.)
-    ### Plot Mollweide Projection
-    plt.figure(figsize=(10,10))
-    ## Set up map
-    bmap = Basemap(projection='moll',lon_0=0.)
-    bmap.drawparallels(np.arange(-90.,90.,15.))
-    bmap.drawmeridians(np.arange(0.,360.,15.))
-    ## Convert Coordinates to those used by basemap to plot
-    lon,lat = bmap(lon_grid,lat_grid)
-    bmap.contourf(lon,lat,absu,15,cmap=plt.cm.Reds,alpha=0.5)
-    bmap.quiver(lon[::Nvec,::Nvec],lat[::Nvec,::Nvec],u[::Nvec,::Nvec],v[::Nvec,::Nvec], scale=v_scale)
-#    plt.title('MAC, Mollweide Projection Vector Field for m={0}, l={1}'.format(m,l))
-#    plt.savefig('./output/m={1}/MAC_MollweideVectorField_m={1}_l={2}.png'.format(val.imag,m,l))
+#def plot_mollyweide(model,vec,val,m,l,v_scale=1.0):
+#    E = model.E
+#    Nk = model.Nk
+#    Nl = model.Nl
+#    th = model.th
+#    ## Calculate vector field and contour field for plotting with basemap
+#    ## Create full vector grid in theta and phi
+#    u_1D = model.get_variable(vec,'uph')[0][0]
+#    v_1D = model.get_variable(vec,'uth')[0][0]
+#    Nph = 2*Nl
+#    ph = np.linspace(-180.,180.-360./Nph,Nph)
+#    lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
+#    v = ((np.exp(1j*m*lon_grid*np.pi/180.).T*v_1D).T).real
+#    u = ((np.exp(1j*m*lon_grid*np.pi/180.).T*u_1D).T).real
+#    absu=u.real**2 + v.real**2
+#    Nvec = np.floor(Nl/20.)
+#    ### Plot Mollweide Projection
+#    plt.figure(figsize=(10,10))
+#    ## Set up map
+#    bmap = Basemap(projection='moll',lon_0=0.)
+#    bmap.drawparallels(np.arange(-90.,90.,15.))
+#    bmap.drawmeridians(np.arange(0.,360.,15.))
+#    ## Convert Coordinates to those used by basemap to plot
+#    lon,lat = bmap(lon_grid,lat_grid)
+#    bmap.contourf(lon,lat,absu,15,cmap=plt.cm.Reds,alpha=0.5)
+#    bmap.quiver(lon[::Nvec,::Nvec],lat[::Nvec,::Nvec],u[::Nvec,::Nvec],v[::Nvec,::Nvec], scale=v_scale)
+##    plt.title('MAC, Mollweide Projection Vector Field for m={0}, l={1}'.format(m,l))
+##    plt.savefig('./output/m={1}/MAC_MollweideVectorField_m={1}_l={2}.png'.format(val.imag,m,l))
 
-def plot_B_obs(model, vec, m, oscillate=False, dir_name='./', title='B-Perturbation at Core Surface'):
-    Nl = model.Nl
-    th = model.th
+#def plot_B_obs(model, vec, m, oscillate=False, dir_name='./', title='B-Perturbation at Core Surface'):
+#    Nl = model.Nl
+#    th = model.th
+#
+#    ## Plot Robinson vector field
+#    #### Display waves on a Spherical Map Projection
+#    projtype = 'robin'
+#    ## Create full vector grid in theta and phi
+#    Bobsth = model.get_variable(model.BobsMat.tocsr()*vec, 'ur')[0][-1,:]
+#    if oscillate:
+#        Bobsth[::2] = Bobsth[::2]*-1
+#    Nph = 2*Nl
+#    ph = np.linspace(-180.,180.-360./Nph,Nph)
+#    lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
+#    Bobs = (np.exp(1j*m*lon_grid*np.pi/180.).T*Bobsth).T
+#
+#    ### Plot Robinson Projection
+#    plt.figure(figsize=(10,10))
+#    ## Set up map
+#    bmap = Basemap(projection=projtype,lon_0=0.)
+#    bmap.drawparallels(np.arange(-90.,90.,15.))
+#    bmap.drawmeridians(np.arange(0.,360.,15.))
+#    ## Convert Coordinates to those used by basemap to plot
+#    lon,lat = bmap(lon_grid,lat_grid)
+#    bmap.contourf(lon,lat,Bobs.real,15,cmap=plt.cm.RdBu,alpha=0.5)
+#    plt.title(title)
+##    plt.show()
+#    plt.savefig(dir_name+title+'.png')
 
-    ## Plot Robinson vector field
-    #### Display waves on a Spherical Map Projection
-    projtype = 'robin'
-    ## Create full vector grid in theta and phi
-    Bobsth = model.get_variable(model.BobsMat.tocsr()*vec, 'ur')[0][-1,:]
-    if oscillate:
-        Bobsth[::2] = Bobsth[::2]*-1
-    Nph = 2*Nl
-    ph = np.linspace(-180.,180.-360./Nph,Nph)
-    lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
-    Bobs = (np.exp(1j*m*lon_grid*np.pi/180.).T*Bobsth).T
-
-    ### Plot Robinson Projection
-    plt.figure(figsize=(10,10))
-    ## Set up map
-    bmap = Basemap(projection=projtype,lon_0=0.)
-    bmap.drawparallels(np.arange(-90.,90.,15.))
-    bmap.drawmeridians(np.arange(0.,360.,15.))
-    ## Convert Coordinates to those used by basemap to plot
-    lon,lat = bmap(lon_grid,lat_grid)
-    bmap.contourf(lon,lat,Bobs.real,15,cmap=plt.cm.RdBu,alpha=0.5)
-    plt.title(title)
-#    plt.show()
-    plt.savefig(dir_name+title+'.png')
-
-def plot_robinson(model, vec, m, v_scale=1.0, oscillate=False, dir_name='./', title='Velocity and Divergence at CMB'):
-    E = model.E
-    Nk = model.Nk
-    Nl = model.Nl
-    th = model.th
-
-    ## Plot Robinson vector field
-    #### Display waves on a Spherical Map Projection
-    projtype = 'robin'
-    ## Create full vector grid in theta and phi
-    u_1D = model.get_variable(vec,'uph')[0][-1,:]
-    v_1D = model.get_variable(vec,'uth')[0][-1,:]
-    if oscillate:
-        u_1D[::2] = u_1D[::2]*-1
-        v_1D[::2] = v_1D[::2]*-1
-    Nph = 2*Nl
-    ph = np.linspace(-180.,180.-360./Nph,Nph)
-    lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
-    v = (np.exp(1j*m*lon_grid*np.pi/180.).T*v_1D).T
-    u = (np.exp(1j*m*lon_grid*np.pi/180.).T*u_1D).T
-    absu=u**2 + v**2
-
-    div = np.zeros(u.shape)
-    for x in range(Nph):
-        for y in range(1,model.Nl-1):
-            div[y,x] = u[y,x]*m*1j + (v[y+1,x]-v[y-1,x])/(2.*model.dth)
-#    import ipdb; ipdb.set_trace()
-    ### Plot Robinson Projection
-    plt.figure(figsize=(10,10))
-    ## Set up map
-    bmap = Basemap(projection=projtype,lon_0=0.)
-    bmap.drawparallels(np.arange(-90.,90.,15.))
-    bmap.drawmeridians(np.arange(0.,360.,15.))
-    ## Convert Coordinates to those used by basemap to plot
-    lon,lat = bmap(lon_grid,lat_grid)
-    bmap.contourf(lon,lat,div.real,15,cmap=plt.cm.RdBu,alpha=0.5)
-    Nvec = np.floor(Nl/20.)
-    bmap.quiver(lon[::Nvec,::Nvec],lat[::Nvec,::Nvec],u[::Nvec,::Nvec].real,v[::Nvec,::Nvec].real, scale=v_scale)
-    plt.title(title)
-#    plt.show()
-    plt.savefig(dir_name+title+'.png')
+#def plot_robinson(model, vec, m, v_scale=1.0, oscillate=False, dir_name='./', title='Velocity and Divergence at CMB'):
+#    E = model.E
+#    Nk = model.Nk
+#    Nl = model.Nl
+#    th = model.th
+#
+#    ## Plot Robinson vector field
+#    #### Display waves on a Spherical Map Projection
+#    projtype = 'robin'
+#    ## Create full vector grid in theta and phi
+#    u_1D = model.get_variable(vec,'uph')[0][-1,:]
+#    v_1D = model.get_variable(vec,'uth')[0][-1,:]
+#    if oscillate:
+#        u_1D[::2] = u_1D[::2]*-1
+#        v_1D[::2] = v_1D[::2]*-1
+#    Nph = 2*Nl
+#    ph = np.linspace(-180.,180.-360./Nph,Nph)
+#    lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
+#    v = (np.exp(1j*m*lon_grid*np.pi/180.).T*v_1D).T
+#    u = (np.exp(1j*m*lon_grid*np.pi/180.).T*u_1D).T
+#    absu=u**2 + v**2
+#
+#    div = np.zeros(u.shape)
+#    for x in range(Nph):
+#        for y in range(1,model.Nl-1):
+#            div[y,x] = u[y,x]*m*1j + (v[y+1,x]-v[y-1,x])/(2.*model.dth)
+##    import ipdb; ipdb.set_trace()
+#    ### Plot Robinson Projection
+#    plt.figure(figsize=(10,10))
+#    ## Set up map
+#    bmap = Basemap(projection=projtype,lon_0=0.)
+#    bmap.drawparallels(np.arange(-90.,90.,15.))
+#    bmap.drawmeridians(np.arange(0.,360.,15.))
+#    ## Convert Coordinates to those used by basemap to plot
+#    lon,lat = bmap(lon_grid,lat_grid)
+#    bmap.contourf(lon,lat,div.real,15,cmap=plt.cm.RdBu,alpha=0.5)
+#    Nvec = np.floor(Nl/20.)
+#    bmap.quiver(lon[::Nvec,::Nvec],lat[::Nvec,::Nvec],u[::Nvec,::Nvec].real,v[::Nvec,::Nvec].real, scale=v_scale)
+#    plt.title(title)
+##    plt.show()
+#    plt.savefig(dir_name+title+'.png')
 
 def plot_A(A,m):
     ### Plot A Matrix (M*l*x = A*x) ###
