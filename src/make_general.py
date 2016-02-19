@@ -6,7 +6,7 @@ import numpy as np
 
 # Import configuration file
 sys.path.append('../config')
-import cfg_general as cfg
+import cfg_make_general as cfg
 
 
 #constant parameters

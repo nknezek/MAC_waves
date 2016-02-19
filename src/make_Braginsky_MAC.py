@@ -6,7 +6,7 @@ import numpy as np
 
 # Import configuration file
 sys.path.append('../config')
-import cfg_braginsky_MAC_match as cfg
+import cfg_make_braginsky_MAC_match as cfg
 
 
 #constant parameters

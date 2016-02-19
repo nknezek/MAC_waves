@@ -26,8 +26,8 @@ g = 10.  # Gravity in m/s^2
 dCyr = [71.]
 
 # background magnetic field in (Tesla)
-# chocies: dipole, dipole_Br, abs_dipole, abs_dipole_Br, constant_Br, set, Br_sinfunc
-B_type = 'dipole_Br'
+# chocies: dipole, dipoleBr, absDipole, absDipoleBr, constantBr, set, sinfuncBr
+B_type = 'constantBr'
 B_mag = [0.25e-3]
 Bd = B_mag
 Br = B_mag

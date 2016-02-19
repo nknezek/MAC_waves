@@ -16,7 +16,7 @@ from datetime import datetime
 # Import configuration file
 sys.path.append('../config')
 #import cfg_solve_general as cfg
-import cfg_solve_Braginsky as cfg
+import cfg_solve_general as cfg
 
 
 def find_closest_CC(Target, dCyr_list):
@@ -59,9 +59,10 @@ for c in combinations:
     data_dir = c['data_dir']
     use_initial_guess = c['use_initial_guess']
     oscillate = c['oscillate']
-    N = data_dir[41:45]
-    H = data_dir[28:32]
-    B = data_dir[46:]
+    data_dir_info = data_dir.strip('/').split('_')
+    H = data_dir_info[4]
+    N = data_dir_info[5]
+    B = data_dir_info[6]
     out_dir = out_dir_base + '{0}/{1}/{2}/'.format(N, B, H)
     logger = mlog.setup_custom_logger(dir_name=out_dir, filename='SLEPc.log')
     for T in T_list:

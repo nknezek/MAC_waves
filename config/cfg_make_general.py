@@ -9,12 +9,12 @@ import macloglib as mlog
 m = [0]
 
 # Size of grid
-Nk = 20 # Radial cells
+Nk = 40 # Radial cells
 Nl = 200 # Latitudinal cells
 
 # Define Physical Constants
 R = 3480e3  # Outer core radius in (m)
-h = [80e3]  # layer thickness in (m)
+h = [140e3]  # layer thickness in (m)
 Omega = 2*np.pi/(23.9345*3600.0)  # rotation rate in (rad/s)
 rho = 1.e4   # density in (kg/m^3)
 nu = [1e-5]   # momentum diffusivity in (m^2/s)
@@ -26,9 +26,9 @@ g = 10.  # Gravity in m/s^2
 dCyr = [71.]
 
 # background magnetic field in (Tesla)
-# chocies: dipole, dipole_Br, abs_dipole, abs_dipole_Br, constant_Br, set, Br_sinfunc
-B_type = 'dipole_Br'
-B_mag = [0.25e-3]
+# chocies: dipole, dipoleBr, absDipole, absDipoleBr, constantBr, set, sinfuncBr
+B_type = 'constantBr'
+B_mag = [0.6e-3]
 Bd = B_mag
 Br = B_mag
 Bth = None
@@ -42,7 +42,7 @@ Uphi = np.ones((Nk+2, Nl+2))*0.0
 
 # Buoyancy Frequency
 # choices: constant, linear
-buoy_type = 'constant'
+buoy_type = 'linear'
 buoy_ratio =  [2]
 #omega_g0 = buoy_ratio*Omega  # Maximum buoyancy frequency in (rad/s)
 #drho_dr_0 = -omega_g0**2*rho/g  # Maximum density gradient
@@ -54,6 +54,6 @@ buoy_ratio =  [2]
 # model parameters
 model_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p', 'r_disp')
 boundary_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p')
-dir_suf = '_reducedB_ep1e-3'
+dir_suf = ''
 
 ep = 1e-3

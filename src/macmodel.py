@@ -151,21 +151,21 @@ class Model():
         """
         if B_type == 'dipole':
             self.set_B_dipole(Bd, const=const)
-        elif B_type == 'dipole_Br':
+        elif B_type == 'dipoleBr':
             self.set_Br_dipole(Bd, const=const)
-        elif B_type == 'constant_Br':
+        elif B_type == 'constantBr':
             self.set_Br(Br*np.ones((self.Nk+2, self.Nl+2)))
             self.set_Bth(0.0*np.ones((self.Nk+2, self.Nl+2)))
         elif B_type == 'set':
             self.set_Br(Br)
             self.set_Bth(Bth)
-        elif B_type == 'abs_dipole_Br':
+        elif B_type == 'absDipoleBr':
             self.set_Br_abs_dipole(Bd, const=const)
-        elif B_type == 'abs_dipole':
+        elif B_type == 'absDipole':
             self.set_B_abs_dipole(Bd, const=const)
-        elif B_type == 'dipole_absrsymth':
+        elif B_type == 'dipoleAbsRSymTh':
             self.set_B_dipole_absrsymth(Bd, const=const)
-        elif B_type == 'Br_sinfunc':
+        elif B_type == 'sinfuncBr':
             self.set_Br_sinfunc(Bmin, Bmax, sin_exp=sin_exp)
         else:
             raise Exception('B_type not valid')

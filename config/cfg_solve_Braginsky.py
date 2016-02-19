@@ -3,7 +3,6 @@ import numpy as np
 """ Configuration File for SLEPc Run solving MAC model """
 
 T_list = [69.01]
-
 dCyr_list = [71.0]
 
 nev = 3
