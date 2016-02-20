@@ -254,18 +254,18 @@ class Model(macmodel.Model):
 #        self.B_vals += self.B_uph.vals
 #        del self.B_uph
 #
-#        self.add_gov_equation('B_rlorentz', 'br')
-#        self.B_rlorentz.add_term('br', '1')
-#        self.B_rows += self.B_rlorentz.rows
-#        self.B_cols += self.B_rlorentz.cols
-#        self.B_vals += self.B_rlorentz.vals
-#        del self.B_rlorentz
+        self.add_gov_equation('B_rlorentz', 'br')
+        self.B_rlorentz.add_term('br', '1')
+        self.B_rows = self.B_rlorentz.rows
+        self.B_cols = self.B_rlorentz.cols
+        self.B_vals = self.B_rlorentz.vals
+        del self.B_rlorentz
 
         self.add_gov_equation('B_thlorentz', 'bth')
         self.B_thlorentz.add_term('bth', '1')
-        self.B_rows = self.B_thlorentz.rows
-        self.B_cols = self.B_thlorentz.cols
-        self.B_vals = self.B_thlorentz.vals
+        self.B_rows += self.B_thlorentz.rows
+        self.B_cols += self.B_thlorentz.cols
+        self.B_vals += self.B_thlorentz.vals
         del self.B_thlorentz
 
         self.add_gov_equation('B_phlorentz', 'bph')
