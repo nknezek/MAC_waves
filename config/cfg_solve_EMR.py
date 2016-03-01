@@ -74,8 +74,8 @@ data_dir = [
 #            '../data/k20_l120_m2_nu1e-02_80km_constantG600_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 ## 0.6 mT, 8 Om
 #            '../data/k20_l120_m2_nu1e-02_30km_constantG800_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
-#            '../data/k20_l120_m2_nu1e-02_35km_constantG800_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
-#            '../data/k20_l120_m2_nu1e-02_40km_constantG800_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
+           '../data/k20_l120_m2_nu1e-02_35km_constantG800_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
+           '../data/k20_l120_m2_nu1e-02_40km_constantG800_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_50km_constantG800_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_60km_constantG800_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_70km_constantG800_constant_BrB60_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
@@ -92,8 +92,8 @@ data_dir = [
 #            '../data/k20_l120_m2_nu1e-02_80km_constantG400_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 ## 0.65 mT, 8 Om
 #            '../data/k20_l120_m2_nu1e-02_30km_constantG800_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
-#            '../data/k20_l120_m2_nu1e-02_35km_constantG800_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
-#            '../data/k20_l120_m2_nu1e-02_40km_constantG800_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
+           '../data/k20_l120_m2_nu1e-02_35km_constantG800_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
+           '../data/k20_l120_m2_nu1e-02_40km_constantG800_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_50km_constantG800_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_60km_constantG800_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_70km_constantG800_constant_BrB65_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
@@ -134,8 +134,8 @@ data_dir = [
 #            '../data/k20_l120_m2_nu1e-02_80km_constantG600_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 ## 0.7 mT, 8 Om
 #            '../data/k20_l120_m2_nu1e-02_30km_constantG800_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
-#            '../data/k20_l120_m2_nu1e-02_35km_constantG800_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
-#            '../data/k20_l120_m2_nu1e-02_40km_constantG800_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
+           '../data/k20_l120_m2_nu1e-02_35km_constantG800_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
+           '../data/k20_l120_m2_nu1e-02_40km_constantG800_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_50km_constantG800_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_60km_constantG800_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',
 #            '../data/k20_l120_m2_nu1e-02_70km_constantG800_constant_BrB70_noCC_asymp_nuth0e+00_etath0e+00_Bobs/',

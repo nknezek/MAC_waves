@@ -5,8 +5,8 @@ import numpy as np
 T_list = [80.1]
 #T_list = [53., 99.]
 #T_list = [41.,77.]
-
 delta_T = 30.
+
 nev = 10
 D3sq_filter = 10e8
 dth_filter = 10e8
