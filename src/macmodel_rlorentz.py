@@ -47,12 +47,12 @@ class Model(macmodel.Model):
         self.tmom.add_D3sq('uth', 'E')
         self.tmom.add_dth('ur', 'E/r[k]')
         self.tmom.add_dph('uph', '-E*cos(th[l])/(sin(th[l])*r[k])')
-#        self.tmom.add_dr('bth', 'E/Prm*Br[k,l]')
-#        self.tmom.add_dr('br', '-E/Prm*Bth[k,l]')
-#        self.tmom.add_dth('bth', 'E/Prm*Bth[k,l]')
-#        self.tmom.add_dth('br', '-E/Prm*Br[k,l]')
+        self.tmom.add_dr('bth', 'E/Prm*Br[k,l]')
+        self.tmom.add_dr('br', '-E/Prm*Bth[k,l]')
+        self.tmom.add_dth('bth', 'E/Prm*Bth[k,l]')
+        self.tmom.add_dth('br', '-E/Prm*Br[k,l]')
 #        self.tmom.add_dth('bph', '-E/Prm*Bph[k,l]')
-#        self.tmom.add_dph('bph', 'E/Prm*Bth[k,l]')
+        self.tmom.add_dph('bph', 'E/Prm*Bth[k,l]')
 #        self.tmom.add_dph('bth', 'E/Prm*Bph[k,l]')
         self.A_rows += self.tmom.rows
         self.A_cols += self.tmom.cols
@@ -69,11 +69,11 @@ class Model(macmodel.Model):
         self.pmom.add_dph('uth', 'E*cos(th[l])/(sin(th[l])*r[k])')
         self.pmom.add_dr('bph', 'E/Prm*Br[k,l]')
 #        self.pmom.add_dr('br', '-E/Prm*Bph[k,l]')
-#        self.pmom.add_dth('bph', 'E/Prm*Bth[k,l]')
+        self.pmom.add_dth('bph', 'E/Prm*Bth[k,l]')
 #        self.pmom.add_dth('bth', 'E/Prm*Bph[k,l]')
 #        self.pmom.add_dph('bph', 'E/Prm*Bph[k,l]')
-#        self.pmom.add_dph('br', '-E/Prm*Br[k,l]')
-#        self.pmom.add_dph('bth', '-E/Prm*Bth[k,l]')
+        self.pmom.add_dph('br', '-E/Prm*Br[k,l]')
+        self.pmom.add_dph('bth', '-E/Prm*Bth[k,l]')
         self.A_rows += self.pmom.rows
         self.A_cols += self.pmom.cols
         self.A_vals += self.pmom.vals
@@ -84,7 +84,7 @@ class Model(macmodel.Model):
         ################################
         # r-Lorentz
         self.add_gov_equation('rlorentz', 'br')
-#        self.rlorentz.add_dth('ur', 'Bth[k,l]')
+        self.rlorentz.add_dth('ur', 'Bth[k,l]')
         self.rlorentz.add_dth('uth', '-Br[k,l]')
 #        self.rlorentz.add_dph('ur', 'Bph[k,l]')
         self.rlorentz.add_dph('uph', '-Br[k,l]')
@@ -109,9 +109,9 @@ class Model(macmodel.Model):
         # theta-Lorentz
         self.add_gov_equation('thlorentz', 'bth')
         self.thlorentz.add_dr('uth', 'Br[k,l]')
-#        self.thlorentz.add_dr('ur', '-Bth[k,l]')
+        self.thlorentz.add_dr('ur', '-Bth[k,l]')
 #        self.thlorentz.add_dph('uth', 'Bph[k, l]')
-#        self.thlorentz.add_dph('uph', '-Bth[k, l]')
+        self.thlorentz.add_dph('uph', '-Bth[k, l]')
         self.thlorentz.add_D3sq('bth', 'E/Prm')
         self.thlorentz.add_dth('br', 'E/Prm/r[k]')
         self.thlorentz.add_dph('bph', '-E/Prm*cos(th[l])/(sin(th[l])*r[k])')
@@ -124,7 +124,7 @@ class Model(macmodel.Model):
         self.add_gov_equation('phlorentz', 'bph')
         self.phlorentz.add_dr('uph', 'Br[k,l]')
 #        self.phlorentz.add_dr('ur', '-Bph[k,l]')
-#        self.phlorentz.add_dth('uph', 'Bth[k,l]')
+        self.phlorentz.add_dth('uph', 'Bth[k,l]')
 #        self.phlorentz.add_dth('uth', '-Bph[k,l]')
         self.phlorentz.add_D3sq('bph', 'E/Prm')
         self.phlorentz.add_dph('br', 'E/Prm/r[k]')
@@ -254,18 +254,18 @@ class Model(macmodel.Model):
 #        self.B_vals += self.B_uph.vals
 #        del self.B_uph
 #
-#        self.add_gov_equation('B_rlorentz', 'br')
-#        self.B_rlorentz.add_term('br', '1')
-#        self.B_rows += self.B_rlorentz.rows
-#        self.B_cols += self.B_rlorentz.cols
-#        self.B_vals += self.B_rlorentz.vals
-#        del self.B_rlorentz
+        self.add_gov_equation('B_rlorentz', 'br')
+        self.B_rlorentz.add_term('br', '1')
+        self.B_rows = self.B_rlorentz.rows
+        self.B_cols = self.B_rlorentz.cols
+        self.B_vals = self.B_rlorentz.vals
+        del self.B_rlorentz
 
         self.add_gov_equation('B_thlorentz', 'bth')
         self.B_thlorentz.add_term('bth', '1')
-        self.B_rows = self.B_thlorentz.rows
-        self.B_cols = self.B_thlorentz.cols
-        self.B_vals = self.B_thlorentz.vals
+        self.B_rows += self.B_thlorentz.rows
+        self.B_cols += self.B_thlorentz.cols
+        self.B_vals += self.B_thlorentz.vals
         del self.B_thlorentz
 
         self.add_gov_equation('B_phlorentz', 'bph')

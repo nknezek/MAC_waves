@@ -3,13 +3,15 @@ import sys
 import macplotlib as mplt
 import itertools as it
 import numpy as np
+import importlib
 
 # Import configuration file
 sys.path.append('../config')
-import cfg_make_general as cfg
+config_file = sys.argv[1].rstrip('\.py')
+cfg = importlib.import_module(config_file)
+print "used config file {0}".format(config_file)
 
-
-#constant parameters
+# Store constant parameters
 mlog = cfg.mlog
 R = cfg.R
 Omega = cfg.Omega
@@ -22,7 +24,7 @@ dir_suf = cfg.dir_suf
 ep = cfg.ep
 
 # create list of all combinations of iteratable parameters
-iter_param_names = ['m', 'Nk', 'Nl', 'h', 'nu', 'eta', 'dCyr', 'B_type', 'Bd', 'Br', 'Bth', 'const', 'Bmax', 'Bmin', 'sin_exp', 'Uphi', 'buoy_type', 'buoy_ratio', 'mac', 'nu_th', 'eta_th', 'Bnoise']
+iter_param_names = ['m', 'Nk', 'Nl', 'h', 'nu', 'eta', 'dCyr', 'B_type', 'Bd', 'Br', 'Bth', 'const', 'Bmax', 'Bmin', 'sin_exp', 'Uphi', 'buoy_type', 'buoy_ratio', 'mac', 'Bnoise']
 iter_params = {}
 for name in iter_param_names:
     value = eval('cfg.'+name)
@@ -31,9 +33,9 @@ for name in iter_param_names:
     iter_params[name] = value
 varNames = sorted(iter_params)
 combinations = [ dict(zip(varNames, prod)) for prod in it.product(*(iter_params[varName] for varName in varNames))]
-#%%
-for c in combinations:
 
+for c in combinations:
+    # Store Parameters for this model run
     m = c['m']
     Nk = c['Nk']
     Nl = c['Nl']
@@ -42,7 +44,6 @@ for c in combinations:
     eta = c['eta']
     dCyr = c['dCyr']
     B_type = c['B_type']
-#    B_mag = c['B_mag']
     Bd = c['Bd']
     Br = c['Br']
     Bth = c['Bth']
@@ -54,24 +55,21 @@ for c in combinations:
     buoy_ratio = c['buoy_ratio']
     mac = c['mac']
     Uphi = c['Uphi']
-    nu_th = c['nu_th']
-    eta_th = c['eta_th']
     Bnoise = c['Bnoise']
-    
+
     # Directory name to save model
     dir_name = ('../data/k'+str(Nk) + '_l' + str(Nl) +
-                '_m{1:.0f}_nu{2:.0e}_{3:.0f}km_{7}G{4:.0f}_{6}B{5:.0f}{8}/'.format(dCyr, m, nu, h/1e3, buoy_ratio*100., Br*1e5, B_type, buoy_type, dir_suf, nu_th, eta_th))
+                '_m{1:.0f}_nu{2:.0e}_{3:.0f}km_{7}G{4:.0f}_{6}B{5:.0f}{8}/'.format(dCyr, m, nu, h/1e3, buoy_ratio*100., Br*1e5, B_type, buoy_type, dir_suf))
     filemodel = 'model.p' # name of model in directory
     fileA = 'A' # name of A matrix data
     fileB = 'B' # name of M matrix data
 
-    #===============================================================================
     #%% Set up Model
     #===============================================================================
     model_parameters = {'Nk': Nk, 'Nl': Nl, 'm': m}
     physical_constants = {'R': R, 'Omega': Omega, 'rho': rho,
                           'h': h, 'nu': nu, 'eta': eta,
-                          'mu_0': mu_0, 'g': g, 'nu_th':nu_th, 'eta_th':eta_th}
+                          'mu_0': mu_0, 'g': g}
     model = mac.Model(model_variables, boundary_variables,
                       model_parameters, physical_constants)
     model.set_B_by_type(B_type=B_type, Bd=Bd, Br=Br, Bth=Bth, const=const, Bmax=Bmax, Bmin=Bmin, sin_exp=sin_exp, noise=Bnoise)
@@ -84,7 +82,6 @@ for c in combinations:
 
     print 'done setting up model'
 
-    #==============================================================================
     # %% Save Model info
     #==============================================================================
     mplt.plot_buoy_struct(model, dir_name=dir_name)
@@ -96,6 +93,8 @@ for c in combinations:
 
     logger = mlog.setup_custom_logger(dir_name=dir_name, filename='model.log')
     logger.info('\n' +
+    "Model Information:\n" +
+    "from config file: {0}".format(config_file) + '\n\n' +
     'm = ' + str(model.m) + '\n' +
     'Nk = ' + str(model.Nk) + '\n' +
     'Nl = ' + str(model.Nl) + '\n' +
@@ -118,11 +117,10 @@ for c in combinations:
     'model variables = ' + str(model.model_variables) + '\n' +
     'boundary variables = ' + str(model.boundary_variables)
     )
+    print 'model will be saved in ' + str(dir_name)
 
+    #%% Make matricies used for later analysis
     #==============================================================================
-    #%% Make matricies for analysis
-    #==============================================================================
-    print 'model will be saved in' + str(dir_name)
     model.make_Bobs()
     print 'created Bobs matrix'
 #    model.make_D3sqMat()
@@ -131,12 +129,11 @@ for c in combinations:
 #    print 'created dth matrix'
 
 
-    #==============================================================================
-    #%% Save Model
+    #%% Save Model Information
     #==============================================================================
     model.save_model(dir_name + filemodel)
     print 'saved model to ' + str(dir_name)
-    #===============================================================================
+
     #%% Create Matrices
     #===============================================================================
     model.make_B()

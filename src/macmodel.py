@@ -26,15 +26,15 @@ class Model():
 
         self.calculate_nondimensional_parameters()
         self.set_up_grid(self.R, self.h)
-
+        
     def set_up_grid(self, R, h):
-        """
+        '''
         Creates the r and theta coordinate vectors
         inputs:
             R: radius of outer core in m
             h: layer thickness in m
         outputs: None
-        """
+        '''
         self.R = R
         self.h = h
         self.Size_var = self.Nk*self.Nl
@@ -53,10 +53,10 @@ class Model():
         return None
 
     def calculate_nondimensional_parameters(self):
-        """
+        '''
         Calculates the non-dimensional parameters in model from the physical
         constants.
-        """
+        '''
         self.t_star = 1/self.Omega  # seconds
         self.r_star = self.R  # meters
         self.P_star = self.rho*self.r_star**2/self.t_star**2
@@ -64,26 +64,24 @@ class Model():
         self.u_star = self.r_star/self.t_star
         self.E = self.nu*self.t_star/self.r_star**2
         self.Prm = self.nu/self.eta
-        self.Eth = self.nu_th*self.t_star/self.r_star**2
-        self.Eth_Prmth = self.eta_th*self.t_star/self.r_star**2
         return None
 
     def set_Br(self, BrT):
-        """ Sets the backgound magnetic field in Tesla
-        BrT = Br values for each cell in Tesla"""
+        ''' Sets the backgound magnetic field in Tesla
+        BrT = Br values for each cell in Tesla'''
         self.BrT = BrT
         self.Br = self.BrT/self.B_star
         return None
 
     def set_Bth(self, BthT):
-        """ Sets the background theta magnetic field in Tesla
-        BthT = Bth values for each cell in Tesla"""
+        ''' Sets the background theta magnetic field in Tesla
+        BthT = Bth values for each cell in Tesla'''
         self.BthT = BthT
         self.Bth = self.BthT/self.B_star
 
     def set_Br_dipole(self, Bd, const=0):
-        """ Sets the background magnetic field to a dipole field with
-        Bd = dipole constant in Tesla """
+        ''' Sets the background magnetic field to a dipole field with
+        Bd = dipole constant in Tesla '''
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)*Bd + const
         self.Br = self.BrT/self.B_star
@@ -92,8 +90,8 @@ class Model():
         return None
 
     def set_B_dipole(self, Bd, const=0):
-        """ Sets the background magnetic field to a dipole field with
-        Bd = dipole constant in Tesla """
+        ''' Sets the background magnetic field to a dipole field with
+        Bd = dipole constant in Tesla '''
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)*Bd + const
         self.Br = self.BrT/self.B_star
@@ -102,8 +100,8 @@ class Model():
         return None
 
     def set_B_abs_dipole(self, Bd, const=0):
-        """ Sets the background magnetic Br and Bth field to the absolute value of a
-        dipole field with Bd = dipole constant in Tesla """
+        ''' Sets the background magnetic Br and Bth field to the absolute value of a
+        dipole field with Bd = dipole constant in Tesla '''
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
         self.Br = self.BrT/self.B_star
@@ -112,8 +110,8 @@ class Model():
         return None
 
     def set_B_dipole_absrsymth(self, Bd, const=0):
-        """ Sets the background magnetic Br and Bth field to the absolute value of a
-        dipole field with Bd = dipole constant in Tesla """
+        ''' Sets the background magnetic Br and Bth field to the absolute value of a
+        dipole field with Bd = dipole constant in Tesla '''
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
         self.Br = self.BrT/self.B_star
@@ -121,14 +119,29 @@ class Model():
         self.Bth = self.BthT/self.B_star
         return None
 
-    def set_Br_abs_dipole(self, Bd, const=0):
-        """ Sets the background Br magnetic field the absolute value of a
-        dipole with Bd = dipole constant in Tesla"""
-        self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
-        self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
-        self.Bth = self.BthT/self.B_star
+    def set_Br_abs_dipole(self, Bd, const=0, noise=None, N=10000):
+        ''' Sets the background Br magnetic field the absolute value of a
+        dipole with Bd = dipole constant in Tesla.
+        optionally, can offset the dipole by a constant with const or add numerical noise with noise '''
+        if noise:     
+            from scipy.special import erf
+            def folded_mean(mu, s):
+                return s*(2/np.pi)**0.5*np.exp(-mu**2/(2*s**2)) - mu*erf(-mu/(2*s**2)**0.5)
+            self.Bd = Bd
+            Bdip = 2*Bd*np.abs(np.cos(self.th))
+            Bdip_noise = np.zeros_like(Bdip)
+            for (i,B) in enumerate(Bdip):
+                Bdip_noise[i] = folded_mean(Bdip[i], noise)
+            self.BrT = np.ones((self.Nk+2, self.Nl+2))*Bdip_noise
+            self.Br = self.BrT/self.B_star
+            self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
+            self.Bth = self.BthT/self.B_star
+        else:
+            self.Bd = Bd
+            self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
+            self.Br = self.BrT/self.B_star
+            self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
+            self.Bth = self.BthT/self.B_star
         return None
 
     def set_Br_sinfunc(self, Bmin, Bmax, sin_exp=2.5):
@@ -137,18 +150,19 @@ class Model():
         self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
         self.Bth = self.BthT/self.B_star
         return None
-
-    def set_B_by_type(self, B_type, Bd=0.0, Br=0.0, Bth=0.0, const=0.0, Bmin=0.0, Bmax=0.0, sin_exp=2.5):
-        """ Sets the background magnetic field to given type.
+        
+        
+    def set_B_by_type(self, B_type, Bd=0.0, Br=0.0, Bth=0.0, const=0.0, Bmin=0.0, Bmax=0.0, sin_exp=2.5, noise=0.0):
+        ''' Sets the background magnetic field to given type.
         B_type choices:
-            dipole : Br, Bth dipole; specify scalar dipole constant Bd (T)
-            abs_dipole : absolute value of dipole in Br and Bth, specify scalar Bd (T)
-            dipole_Br : Br dipole, Bth=0; specify scalar dipole constant Bd (T)
-            abs_dipole_Br : absolute value of dipole in Br, specify scalar Bd (T)
-            constant_Br : constant Br, Bth=0; specify scalar Br (T)
-            set : specify array Br and Bth values in (T)
-            dipole_absrsymth : absolute value of dipole in Br, symmetric in Bth, specify scalar Bd (T)
-        """
+            * dipole : Br, Bth dipole; specify scalar dipole constant Bd (T)
+            * abs_dipole : absolute value of dipole in Br and Bth, specify scalar Bd (T)
+            * dipole_Br : Br dipole, Bth=0; specify scalar dipole constant Bd (T)
+            * abs_dipole_Br : absolute value of dipole in Br, specify scalar Bd (T)
+            * constant_Br : constant Br, Bth=0; specify scalar Br (T)
+            * set : specify array Br and Bth values in (T)
+            * dipole_absrsymth : absolute value of dipole in Br, symmetric in Bth, specify scalar Bd (T)
+        '''
         if B_type == 'dipole':
             self.set_B_dipole(Bd, const=const)
         elif B_type == 'dipoleBr':
@@ -160,7 +174,7 @@ class Model():
             self.set_Br(Br)
             self.set_Bth(Bth)
         elif B_type == 'absDipoleBr':
-            self.set_Br_abs_dipole(Bd, const=const)
+            self.set_Br_abs_dipole(Bd, const=const, noise=noise)
         elif B_type == 'absDipole':
             self.set_B_abs_dipole(Bd, const=const)
         elif B_type == 'dipoleAbsRSymTh':
@@ -171,24 +185,24 @@ class Model():
             raise Exception('B_type not valid')
 
     def set_CC_skin_depth(self, period):
-        """ sets the magnetic skin depth for conducting core BC
+        ''' sets the magnetic skin depth for conducting core BC
         inputs:
             period = period of oscillation in years
         returns:
             delta_C = skin depth in (m)
-        """
+        '''
         self.delta_C = np.sqrt(2*self.eta/(2*np.pi/(period*365.25*24*3600)))
         self.physical_constants['delta_C'] = self.delta_C
         return self.delta_C
 
     def set_Uphi(self, Uphi):
-        """Sets the background velocity field in m/s"""
+        '''Sets the background velocity field in m/s'''
         self.Uphi = Uphi
         self.U0 = self.Uphi*self.r_star/self.t_star
         return None
 
     def set_buoyancy(self, drho_dr):
-        """Sets the buoyancy structure of the layer"""
+        '''Sets the buoyancy structure of the layer'''
         self.omega_g = np.sqrt(-self.g/self.rho*drho_dr)
         self.G = self.omega_g**2*self.t_star**2
 
@@ -201,7 +215,7 @@ class Model():
         self.G = self.omega_g**2*self.t_star**2
 
     def get_index(self, k, l, var):
-        """
+        '''
         Takes coordinates for a point, gives back index in matrix.
         inputs:
             k: k grid value from 1 to K (or 0 to K+1 for variables with
@@ -210,7 +224,7 @@ class Model():
             var: variable name in model_variables
         outputs:
             index of location in matrix
-        """
+        '''
         Nk = self.Nk
         Nl = self.Nl
         SizeM = self.SizeM
@@ -236,7 +250,7 @@ class Model():
                 return Size_var*self.model_variables.index(var) + (k-1) + (l-1)*Nk
 
     def get_variable(self, vector, var, returnBC=True):
-        """
+        '''
         Takes a flat vector and a variable name, returns the variable in a
         np.matrix and the bottom and top boundary vectors
         inputs:
@@ -245,7 +259,7 @@ class Model():
         outputs:
             if boundary exists: variable, bottom_boundary, top_boundary
             if no boundary exists: variable
-        """
+        '''
         Nk = self.Nk
         Nl = self.Nl
 
@@ -275,7 +289,7 @@ class Model():
                 return variable
 
     def create_vector(self, variables, boundaries):
-        """
+        '''
         Takes a set of variables and boundaries and creates a vector out of
         them.
         inputs:
@@ -284,7 +298,7 @@ class Model():
             boundaries: list of 2 X Nl matrices or vectors for each boundary
         outputs:
             vector of size (SizeM x 1)
-        """
+        '''
         Nk = self.Nk
         Nl = self.Nl
         vector = np.array([1])
@@ -327,7 +341,7 @@ class Model():
         return vals, vecs
 
     def save_mat_PETSc(self, filename, mat, type='Binary'):
-        """ Saves a Matrix in PETSc format """
+        ''' Saves a Matrix in PETSc format '''
         if type == 'Binary':
             viewer = PETSc.Viewer().createBinary(filename, 'w')
         elif type == 'ASCII':
@@ -335,7 +349,7 @@ class Model():
         viewer(mat)
 
     def load_mat_PETSc(self, filename, type='Binary'):
-        """ Loads and returns a Matrix stored in PETSc format """
+        ''' Loads and returns a Matrix stored in PETSc format '''
         if type == 'Binary':
             viewer = PETSc.Viewer().createBinary(filename, 'r')
         elif type == 'ASCII':
@@ -343,7 +357,7 @@ class Model():
         return PETSc.Mat().load(viewer)
 
     def save_vec_PETSc(self, filename, vec, type='Binary'):
-        """ Saves a vector in PETSc format """
+        ''' Saves a vector in PETSc format '''
         if type == 'Binary':
             viewer = PETSc.Viewer().createBinary(filename, 'w')
         elif type == 'ASCII':
@@ -351,7 +365,7 @@ class Model():
         viewer(vec)
 
     def load_vec_PETSc(self, filename, type='Binary'):
-        """ Loads and returns a vector stored in PETSc format """
+        ''' Loads and returns a vector stored in PETSc format '''
         if type == 'Binary':
             viewer = PETSc.Viewer().createBinary(filename, 'r')
         elif type == 'ASCII':
@@ -359,7 +373,7 @@ class Model():
         return PETSc.Mat().load(viewer)
 
     def save_model(self, filename):
-        """ Saves the model structure without the computed A and M matrices"""
+        ''' Saves the model structure without the computed A and M matrices'''
         try:
             self.A
         except:
@@ -486,8 +500,6 @@ class GovEquation():
         Bth = self.model.Bth
         U0 = self.model.U0
         m = self.model.m
-        Eth = self.model.Eth
-        Eth_Prmth = self.model.Eth_Prmth
 
         if l_vals is None:
             l_vals = range(1, Nl+1)
@@ -549,12 +561,12 @@ class GovEquation():
             self.vals.append(eval(value, globals(), locals()))
 
     def add_value(self, value, row, col):
-        """
+        '''
         Adds a term to a specific index.
         value: term to add
         row: dictionary containing 'k','l',and 'var'
         col: dictionary containing 'k','l',and 'var'
-        """
+        '''
         self.rows.append(self.model.get_index(row['k'], row['l'], row['var']))
         self.cols.append(self.model.get_index(col['k'], col['l'], col['var']))
         self.vals.append(eval(value, globals(), locals()))
@@ -643,7 +655,7 @@ class GovEquation():
 
 
 class csr_matrix(scipy.sparse.csr.csr_matrix):
-    """ Subclass to allow conversion to PETSc matrix format"""
+    ''' Subclass to allow conversion to PETSc matrix format'''
     def toPETSc(self, epsilon=1e-12):
         ind = self.nonzero()
         Mat = PETSc.Mat().createAIJ(size=self.shape)
@@ -658,13 +670,13 @@ class csr_matrix(scipy.sparse.csr.csr_matrix):
         return Mat
 
     def tocoo(self, copy=True):
-        """Overridden method to allow converstion to PETsc matrix
+        '''Overridden method to allow converstion to PETsc matrix
 
         Original Documentation:
         Return a COOrdinate representation of this matrix
 
         When copy=False the index and data arrays are not copied.
-        """
+        '''
         major_dim, minor_dim = self._swap(self.shape)
         data = self.data
         minor_indices = self.indices
@@ -680,7 +692,7 @@ class csr_matrix(scipy.sparse.csr.csr_matrix):
 
 
 class coo_matrix(scipy.sparse.coo.coo_matrix):
-    """ Subclass to allow conversion to PETSc matrix format"""
+    ''' Subclass to allow conversion to PETSc matrix format'''
     def toPETSc(self, epsilon=1e-12):
         csr_mat = self.tocsr()
         ind = csr_mat.nonzero()
@@ -711,7 +723,7 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
         return Mat
 
     def tocsr(self):
-        """Overridden method to return csr matrix with toPETsc function
+        '''Overridden method to return csr matrix with toPETsc function
 
         Original Documentation:
         Return a copy of this matrix in Compressed Sparse Row format
@@ -732,7 +744,7 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
                [0, 0, 0, 0],
                [0, 0, 0, 1]])
 
-        """
+        '''
         from scipy.sparse.sputils import get_index_dtype
         
         if self.nnz == 0:

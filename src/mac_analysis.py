@@ -135,6 +135,18 @@ def filter_by_equator_power(model, vals, vecs, equator_fraction=0.5, var='ur'):
             filtered_vecs.append(vec)
     return filtered_vals, filtered_vecs
 
+def filter_by_period(model, vals, vecs, minT, maxT):
+    '''
+    filter results by wave period in years 
+    '''
+    filtered_vals = []
+    filtered_vecs = []
+    for ind, (val, vec) in enumerate(zip(vals, vecs)):
+        Period = (2*np.pi/val.imag)*model.t_star/(24.*3600.*365.25)
+        if Period > minT and Period < maxT:
+            filtered_vals.append(val)
+            filtered_vecs.append(vec)
+    return filtered_vals, filtered_vecs
 
 def get_period(model, val):
     return 2*np.pi/val*model.t_star/(24.*3600.*365.25)
