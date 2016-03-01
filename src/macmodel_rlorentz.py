@@ -28,12 +28,12 @@ class Model(macmodel.Model):
         self.rmom.add_D3sq('ur', 'E')
         self.rmom.add_dth('uth', '-E/r[k]')
         self.rmom.add_dph('uph', '-E/r[k]')
-#        self.rmom.add_dr('br', 'E/Prm*Br[k,l]')
-#        self.rmom.add_dr('bth', '-E/Prm*Bth[k,l]')
+        self.rmom.add_dr('br', 'E/Prm*Br[k,l]')
+        self.rmom.add_dr('bth', '-E/Prm*Bth[k,l]')
 #        self.rmom.add_dr('bph', '-E/Prm*Bph[k,l]')
-#        self.rmom.add_dth('br', 'E/Prm*Bth[k,l]')
-#        self.rmom.add_dth('bth', 'E/Prm*Br[k,l]')
-#        self.rmom.add_dph('bph', 'E/Prm*Br[k,l]')
+        self.rmom.add_dth('br', 'E/Prm*Bth[k,l]')
+        self.rmom.add_dth('bth', 'E/Prm*Br[k,l]')
+        self.rmom.add_dph('bph', 'E/Prm*Br[k,l]')
 #        self.rmom.add_dph('br', 'E/Prm*Bph[k,l]')
         self.A_rows = self.rmom.rows
         self.A_cols = self.rmom.cols
