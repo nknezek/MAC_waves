@@ -76,7 +76,7 @@ class Model():
         elif isinstance(BrT, np.ndarray):
             self.Br = self.BrT/self.B_star
         else:
-            raise TypeError("The type passed for BrT is wrong. It must either be an int, float, or np.ndarray")
+            raise TypeError("BrT must either be an int, float, or np.ndarray")
         self.Br = self.BrT/self.B_star
 
     def set_Bth(self, BthT):
@@ -87,7 +87,7 @@ class Model():
         elif isinstance(BthT, np.ndarray):
             self.Bth = self.BthT/self.B_star
         else:
-            raise TypeError("The type passed for BthT is wrong. It must either be an int, float, or np.ndarray")
+            raise TypeError("BthT must either be an int, float, or np.ndarray")
         self.Bth = self.BthT/self.B_star
 
     def set_Bph(self, BphT):
@@ -98,7 +98,7 @@ class Model():
         elif isinstance(BphT, np.ndarray):
             self.Bph = self.BphT/self.B_star
         else:
-            raise TypeError("The type passed for BphT is wrong. It must either be an int, float, or np.ndarray")
+            raise TypeError("BphT must either be an int, float, or np.ndarray")
         self.Bph = self.BphT/self.B_star
 
     def set_Br_dipole(self, Bd, const=0):
@@ -174,7 +174,6 @@ class Model():
         self.set_Bth(0.0)
         self.set_Bph(0.0)
         return None
-        
         
     def set_B_by_type(self, B_type, Bd=0.0, Br=0.0, Bth=0.0, Bph=0.0, const=0.0, Bmin=0.0, Bmax=0.0, sin_exp=2.5, noise=0.0):
         ''' Sets the background magnetic field to given type.
