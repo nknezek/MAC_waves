@@ -174,7 +174,7 @@ class Model():
         self.set_Bth(0.0)
         self.set_Bph(0.0)
         return None
-        
+
     def set_B_by_type(self, B_type, Bd=0.0, Br=0.0, Bth=0.0, Bph=0.0, const=0.0, Bmin=0.0, Bmax=0.0, sin_exp=2.5, noise=0.0):
         ''' Sets the background magnetic field to given type.
         B_type choices:
