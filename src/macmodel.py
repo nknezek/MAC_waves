@@ -69,17 +69,37 @@ class Model():
         return None
 
     def set_Br(self, BrT):
-        ''' Sets the backgound magnetic field in Tesla
+        ''' Sets the background phi magnetic field in Tesla
         BrT = Br values for each cell in Tesla'''
-        self.BrT = BrT
+        if isinstance(BrT, (float, int)):
+            self.BrT = np.ones((self.Nk+2, self.Nl+2))*BrT
+        elif isinstance(BrT, np.ndarray):
+            self.Br = self.BrT/self.B_star
+        else:
+            raise TypeError("The type passed for BrT is wrong. It must either be an int, float, or np.ndarray")
         self.Br = self.BrT/self.B_star
-        return None
 
     def set_Bth(self, BthT):
-        ''' Sets the background theta magnetic field in Tesla
+        ''' Sets the background phi magnetic field in Tesla
         BthT = Bth values for each cell in Tesla'''
-        self.BthT = BthT
+        if isinstance(BthT, (float, int)):
+            self.BthT = np.ones((self.Nk+2, self.Nl+2))*BthT
+        elif isinstance(BthT, np.ndarray):
+            self.Bth = self.BthT/self.B_star
+        else:
+            raise TypeError("The type passed for BthT is wrong. It must either be an int, float, or np.ndarray")
         self.Bth = self.BthT/self.B_star
+
+    def set_Bph(self, BphT):
+        ''' Sets the background phi magnetic field in Tesla
+        BphT = Bph values for each cell in Tesla'''
+        if isinstance(BphT, (float, int)):
+            self.BphT = np.ones((self.Nk+2, self.Nl+2))*BphT
+        elif isinstance(BphT, np.ndarray):
+            self.Bph = self.BphT/self.B_star
+        else:
+            raise TypeError("The type passed for BphT is wrong. It must either be an int, float, or np.ndarray")
+        self.Bph = self.BphT/self.B_star
 
     def set_Br_dipole(self, Bd, const=0):
         ''' Sets the background magnetic field to a dipole field with
@@ -87,8 +107,9 @@ class Model():
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)*Bd + const
         self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
-        self.Bth = self.BthT/self.B_star
+        self.set_Bth(0.0)
+        self.set_Bph(0.0)
+
         return None
 
     def set_B_dipole(self, Bd, const=0):
@@ -99,6 +120,7 @@ class Model():
         self.Br = self.BrT/self.B_star
         self.BthT = np.ones((self.Nk+2, self.Nl+2))*sin(self.th)*Bd + const
         self.Bth = self.BthT/self.B_star
+        self.set_Bph(0.0)
         return None
 
     def set_B_abs_dipole(self, Bd, const=0):
@@ -109,6 +131,7 @@ class Model():
         self.Br = self.BrT/self.B_star
         self.BthT = np.ones((self.Nk+2, self.Nl+2))*abs(sin(self.th))*Bd + const
         self.Bth = self.BthT/self.B_star
+        self.set_Bph(0.0)
         return None
 
     def set_B_dipole_absrsymth(self, Bd, const=0):
@@ -119,6 +142,7 @@ class Model():
         self.Br = self.BrT/self.B_star
         self.BthT = np.ones((self.Nk+2, self.Nl+2))*sin(self.th)*Bd + const
         self.Bth = self.BthT/self.B_star
+        self.set_Bph(0.0)
         return None
 
     def set_Br_abs_dipole(self, Bd, const=0, noise=None, N=10000):
@@ -136,25 +160,23 @@ class Model():
                 Bdip_noise[i] = folded_mean(Bdip[i], noise)
             self.BrT = np.ones((self.Nk+2, self.Nl+2))*Bdip_noise
             self.Br = self.BrT/self.B_star
-            self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
-            self.Bth = self.BthT/self.B_star
         else:
             self.Bd = Bd
             self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
             self.Br = self.BrT/self.B_star
-            self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
-            self.Bth = self.BthT/self.B_star
+        self.set_Bth(0.0)
+        self.set_Bph(0.0)
         return None
 
     def set_Br_sinfunc(self, Bmin, Bmax, sin_exp=2.5):
         self.BrT = np.ones((self.Nk+2, self.Nl+2))*((1-sin(self.th)**sin_exp)*(Bmax-Bmin)+Bmin)
         self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl+2))*0.0
-        self.Bth = self.BthT/self.B_star
+        self.set_Bth(0.0)
+        self.set_Bph(0.0)
         return None
         
         
-    def set_B_by_type(self, B_type, Bd=0.0, Br=0.0, Bth=0.0, const=0.0, Bmin=0.0, Bmax=0.0, sin_exp=2.5, noise=0.0):
+    def set_B_by_type(self, B_type, Bd=0.0, Br=0.0, Bth=0.0, Bph=0.0, const=0.0, Bmin=0.0, Bmax=0.0, sin_exp=2.5, noise=0.0):
         ''' Sets the background magnetic field to given type.
         B_type choices:
             * dipole : Br, Bth dipole; specify scalar dipole constant Bd (T)
@@ -162,7 +184,7 @@ class Model():
             * dipole_Br : Br dipole, Bth=0; specify scalar dipole constant Bd (T)
             * abs_dipole_Br : absolute value of dipole in Br, specify scalar Bd (T)
             * constant_Br : constant Br, Bth=0; specify scalar Br (T)
-            * set : specify array Br and Bth values in (T)
+            * set : specify array Br, Bth, and Bph values in (T)
             * dipole_absrsymth : absolute value of dipole in Br, symmetric in Bth, specify scalar Bd (T)
         '''
         if B_type == 'dipole':
@@ -175,6 +197,7 @@ class Model():
         elif B_type == 'set':
             self.set_Br(Br)
             self.set_Bth(Bth)
+            self.set_Bph(Bph)
         elif B_type == 'absDipoleBr':
             self.set_Br_abs_dipole(Bd, const=const, noise=noise)
         elif B_type == 'absDipole':
@@ -184,7 +207,7 @@ class Model():
         elif B_type == 'sinfuncBr':
             self.set_Br_sinfunc(Bmin, Bmax, sin_exp=sin_exp)
         else:
-            raise Exception('B_type not valid')
+            raise ValueError('B_type not valid')
 
     def set_CC_skin_depth(self, period):
         ''' sets the magnetic skin depth for conducting core BC
@@ -199,7 +222,12 @@ class Model():
 
     def set_Uphi(self, Uphi):
         '''Sets the background velocity field in m/s'''
-        self.Uphi = Uphi
+        if isinstance(Uphi, (float, int)):
+            self.Uphi = np.ones((self.Nk+2, self.Nl+2))*Uphi
+        elif isinstance(Uphi, np.ndarray):
+            self.Uphi = Uphi
+        else:
+            raise TypeError("The value passed for Uphi must be either an int, float, or np.ndarray")
         self.U0 = self.Uphi*self.r_star/self.t_star
         return None
 
@@ -500,6 +528,7 @@ class GovEquation():
         G = self.model.G
         Br = self.model.Br
         Bth = self.model.Bth
+        Bph = self.model.Bph
         U0 = self.model.U0
         m = self.model.m
 
@@ -548,6 +577,7 @@ class GovEquation():
         G = self.model.G
         Br = self.model.Br
         Bth = self.model.Bth
+        Bph = self.model.Bph
         U0 = self.model.U0
         m = self.model.m
 
