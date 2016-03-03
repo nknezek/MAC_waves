@@ -2,7 +2,7 @@
 
 ##### Display and Save 1D Waves with comparison Spherical Harmonics for found Eigenvalues and vector field map ######
 import matplotlib.cm as cm
-#from mpl_toolkits.basemap import Basemap
+from mpl_toolkits.basemap import Basemap
 from numpy import sin
 from numpy import cos
 import numpy as np

@@ -1,5 +1,4 @@
 import macmodel
-reload(macmodel)
 import numpy as np
 
 class Model(macmodel.Model):

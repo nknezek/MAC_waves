@@ -3,26 +3,26 @@ import numpy as np
 """ Configuration File for SLEPc Run solving MAC model """
 
 # Period and Decay to search for
-T_list = [8.,]
-target_Q = 1.
-delta_T = 6.
+T_list = [-7., -9., -10.]
+target_Q = 1.3
+delta_T = 20.
 
 # Solution mechanics
-nev = 20
+nev = 35
 tol = 1e-8
 use_initial_guess = False
 
 # Filtering Solutions
 D3sq_filter = 10e8
 dth_filter = 10e8
-eq_split = 0.6
+eq_split = 0.8
 eq_var = 'p'
 zeros_wanted = [0,1,2,3,4]
-min_Q = 0.3
-oscillate = True
+min_Q = 0.1
+oscillate = False
 
 # Saving Solutions
-savefile = None
+savefile = 'data.p'
 
 # Plotting Solutions
 real_var = 'ur'
@@ -43,11 +43,11 @@ data_dir = [
            # '../data/k20_l120_m2_nu1e-02_35km_constantG800_constantBrB60/',
            # '../data/k20_l120_m2_nu1e-02_40km_constantG800_constantBrB60/',
 ## 0.65 mT, 8 Om
-           '../data/k20_l120_m2_nu1e-02_35km_constantG800_constantBrB65/',
-           '../data/k20_l120_m2_nu1e-02_40km_constantG800_constantBrB65/',
+           # '../data/k20_l120_m2_nu1e-02_35km_constantG800_constantBrB65/',
+           # '../data/k20_l120_m2_nu1e-02_40km_constantG800_constantBrB65/',
 ## 0.7 mT, 8 Om
-           '../data/k20_l120_m2_nu1e-02_35km_constantG800_constantBrB70/',
-           '../data/k20_l120_m2_nu1e-02_40km_constantG800_constantBrB70/',
+           # '../data/k20_l120_m2_nu1e-02_35km_constantG800_constantBrB70/',
+           # '../data/k20_l120_m2_nu1e-02_40km_constantG800_constantBrB70/',
 ## 0.8 mT, 8 Om
            # '../data/k20_l120_m2_nu1e-02_35km_constantG800_constantBrB80/',
            # '../data/k20_l120_m2_nu1e-02_40km_constantG800_constantBrB80/',
@@ -61,16 +61,22 @@ data_dir = [
            # '../data/k20_l120_m3_nu1e-02_40km_constantG800_constantBrB60/',
 
 ## 0.65 mT, 8 Om
-           '../data/k20_l120_m3_nu1e-02_35km_constantG800_constantBrB65/',
-           '../data/k20_l120_m3_nu1e-02_40km_constantG800_constantBrB65/',
+           # '../data/k20_l120_m3_nu1e-02_35km_constantG800_constantBrB65/',
+           # '../data/k20_l120_m3_nu1e-02_40km_constantG800_constantBrB65/',
 
 ## 0.7 mT, 8 Om
-           '../data/k20_l120_m3_nu1e-02_35km_constantG800_constantBrB70/',
-           '../data/k20_l120_m3_nu1e-02_40km_constantG800_constantBrB70/',
+           # '../data/k20_l120_m3_nu1e-02_35km_constantG800_constantBrB70/',
+           # '../data/k20_l120_m3_nu1e-02_40km_constantG800_constantBrB70/',
+
+## 0.8 mT, 4 Om
+            # '../data/k20_l120_m3_nu1e-02_30km_constantG400_constantBrB80/',
+
+## 0.8 mT, 6 Om
+            # '../data/k20_l120_m3_nu1e-02_30km_constantG600_constantBrB80/',
 
 ## 0.8 mT, 8 Om
-           # '../data/k20_l120_m3_nu1e-02_30km_constantG800_constantBrB80/',
-           # '../data/k20_l120_m3_nu1e-02_35km_constantG800_constantBrB80/',
+           '../data/k20_l120_m3_nu1e-02_35km_constantG800_constantBrB80/',
+           '../data/k20_l120_m3_nu1e-02_40km_constantG800_constantBrB80/',
 
 #==============================================================================
 ###  m = 6
@@ -81,12 +87,12 @@ data_dir = [
            # '../data/k20_l120_m6_nu1e-02_40km_constantG600_constantBrB60/',
 
 ## 0.65mT, 6 Om
-           '../data/k20_l120_m6_nu1e-02_35km_constantG600_constantBrB65/',
-           '../data/k20_l120_m6_nu1e-02_40km_constantG600_constantBrB65/',
+           # '../data/k20_l120_m6_nu1e-02_35km_constantG600_constantBrB65/',
+           # '../data/k20_l120_m6_nu1e-02_40km_constantG600_constantBrB65/',
 
 # B 0.70mT, 6 Om
-           '../data/k20_l120_m6_nu1e-02_35km_constantG600_constantBrB70/',
-           '../data/k20_l120_m6_nu1e-02_40km_constantG600_constantBrB70/',
+#            '../data/k20_l120_m6_nu1e-02_35km_constantG600_constantBrB70/',
+#            '../data/k20_l120_m6_nu1e-02_40km_constantG600_constantBrB70/',
 
 # B 0.8 mT, 6 Om
 #            '../data/k20_l120_m6_nu1e-02_35km_constantG600_constantBrB80/',

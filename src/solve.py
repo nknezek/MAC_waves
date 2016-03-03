@@ -10,6 +10,7 @@ import itertools as it
 from datetime import datetime
 import sys
 import importlib
+import shutil
 
 import slepc4py
 slepc4py.init(sys.argv)
@@ -47,7 +48,7 @@ plot_B_obs = cfg.plot_B_obs
 plot_vel = cfg.plot_vel
 target_Q = cfg.target_Q
 tol = cfg.tol
-
+delta_T = cfg.delta_T
 
 # Iterate over parameters that can vary
 iter_param_names = ['data_dir', 'use_initial_guess', 'oscillate']
@@ -62,6 +63,14 @@ combinations = [ dict(zip(varNames, prod)) for prod in it.product(*(iter_params[
 
 # Store main output directory
 out_dir_base = '../output/{0}_{1}/'.format(datetime.today().strftime("%Y-%m-%d_%H-%M-%S"), config_file[9:])
+# Set up logger
+logger = mlog.setup_custom_logger(dir_name=out_dir_base, filename='run.log')
+
+# Store config file for later reference
+logger.info('used config file {0}.py'.format(config_file))
+shutil.copyfile('../config/'+config_file + '.py', out_dir_base+config_file+'.py')
+logger.info('Main output directory set to {0}'.format(out_dir_base))
+
 
 for cnum, c in enumerate(combinations):
     data_dir = c['data_dir']
@@ -70,18 +79,17 @@ for cnum, c in enumerate(combinations):
 
     # Get information on layer thickness, buoyancy frequency, and magnetic field from data directory
     data_dir_info = data_dir.strip('/').split('_')
+    m = data_dir_info[2]
     H = data_dir_info[4]
     N = data_dir_info[5]
     B = data_dir_info[6]
 
     # Set up directory to store solution data
-    out_dir = out_dir_base + '{0}/{1}/{2}/'.format(N, B, H)
-    logger = mlog.setup_custom_logger(dir_name=out_dir, filename='run.log')
-    logger.info('used config file {0}'.format(config_file))
-    logger.info('Main output directory set to {0}'.format(out_dir))
+    out_dir = out_dir_base + '{0}/{1}/{2}/{3}/'.format(m, N, B, H)
+    logger.info('\n\nParameter Set {0}, m = {1}, H = {2}, B = {3}, N = {4} \n'.format(cnum, m, H, B, N))
 
     for tnum,T in enumerate(T_list):
-        logger.info('\n\nRun {0}, Target {1} yrs\n'.format(tnum, T))
+        logger.info('\n\nT guess {0}, Target {1:.1f} yrs, DelT {2:.1f} yrs'.format(tnum, T, delta_T))
 
         # Convert Time in years to model frequency
         t_star = (23.9345*3600)/(2*np.pi)
@@ -108,7 +116,8 @@ for cnum, c in enumerate(combinations):
             logger.info('A'+str(dCyr_use)+' matrix used')
             logger.info('matrices and model loaded into memory from ' + data_dir)
         except:
-            logger.info( "Could not load matrices from file: ", sys.exc_info()[0])
+            logger.error( "Could not load matrices from file", exc_info=1)
+            break
 
         # %% Make initial vector guess
         #==============================================================================
@@ -124,7 +133,8 @@ for cnum, c in enumerate(combinations):
                 mplt.plot_pcolormesh_rth(model, '-1', start_vec, dir_name=out_dir, title='initial guess', physical_units=True)
                 logger.info('created initial guess')
         except:
-            logger.info('problem creating initial vector guess: ', sys.exc_info()[0])
+            logger.error('problem creating initial vector guess ', exc_info=1)
+            break
 
         # %% Set up SLEPc Solver
         #==============================================================================
@@ -144,10 +154,11 @@ for cnum, c in enumerate(combinations):
             EPS.setFromOptions()
             ST = EPS.getST()
             ST.setType(SLEPc.ST.Type.SINVERT)
-            logger.info('solver set up, Period = {0:.2e}, nev = {1}'.format(T, nev))
+            logger.info('solver set up, Period = {0:.1f}, nev = {1}'.format(T, nev))
             logger.info('eigenvalue target = {0:.1e}'.format(Target))
         except:
-            print "Could not set up SLEPc solver: ", sys.exc_info()[0]
+            logger.error( "Could not set up SLEPc solver ", exc_info=1)
+            break
 
         # %% Solve Problem
         #==============================================================================
@@ -155,7 +166,8 @@ for cnum, c in enumerate(combinations):
             EPS.solve()
             logger.info('problem solved')
         except:
-            logger.info("Could not solve problem: ", sys.exc_info()[0])
+            logger.error("Could not solve problem.")
+            break
         try:
             # Save Computed Solutions
             conv = EPS.getConverged()
@@ -171,7 +183,8 @@ for cnum, c in enumerate(combinations):
             Period_min = (2*np.pi/max([x.imag for x in vals]))*model.t_star/(24.*3600.*365.25)
             logger.info('min Period = {0:.1f}yrs, max Period = {1:.1f}yrs'.format(Period_min, Period_max))
         except:
-            logger.info("Could not get converged eigenvalues: ", sys.exc_info()[0])
+            logger.error("Could not get converged eigenvalues.", exc_info=1)
+            break
 
         #%% Filter Solutions
         #==============================================================================
@@ -201,8 +214,8 @@ for cnum, c in enumerate(combinations):
             logger.info('\t{0} eigenvectors found with Q > {1:.2f}'.format(len(fvecs), cfg.min_Q))
 
             #%% Filter by Period
-            fvals, fvecs = mana.filter_by_period(model, fvals, fvecs, T-cfg.delta_T, T+cfg.delta_T)
-            logger.info('\t{0} eigenvectors found with {1:.2f} < T < {2:.2f}'.format(len(fvecs), T-cfg.delta_T, T+cfg.delta_T))
+            fvals, fvecs = mana.filter_by_period(model, fvals, fvecs, T- delta_T, T+ delta_T)
+            logger.info('\t{0} eigenvectors found with {1:.2f} < T < {2:.2f}'.format(len(fvecs), T- delta_T, T+ delta_T))
 
             #%% Convert Eigenvectors to ur real
             fvecs_tmp = []
@@ -211,16 +224,18 @@ for cnum, c in enumerate(combinations):
             fvecs = fvecs_tmp
             logger.info('\t{0} eigenvectors shifted so that {1} is real to plot'.format(len(fvecs), real_var))
         except:
-            logger.info("Problem Filtering Eigenvalues: ", sys.exc_info()[0])
+            logger.error("Problem Filtering Eigenvalues.", exc_info=1)
+            break
 
         # %% Save Filtered Eigenvectors
         #==============================================================================
         try:
             if savefile:
-                pkl.dump({'vals': vals, 'vecs': vecs, 'model':model},open(out_dir_T + savefile, 'wb'))
+                pkl.dump({'vals': fvals, 'vecs': fvecs, 'model':model},open(out_dir_T + savefile, 'wb'))
                 logger.info('vals and vecs saved to ' + out_dir_T + savefile)
         except:
-            logger.info("Problem Saving Filtered Eigenvalues: ", sys.exc_info()[0])
+            logger.error("Problem Saving Filtered Eigenvalues.", exc_info=1)
+            break
 
         # %% Plot Filtered Eigenvectors
         #==============================================================================
@@ -239,8 +254,9 @@ for cnum, c in enumerate(combinations):
                 if plot_robinson:
                     mplt.plot_robinson(model, vec, model.m, oscillate=oscillate, dir_name=out_dir_T, title=str(ind)+'_T{0:.2f}yrs_'.format(Period)+'Divergence')
                 if plot_B_obs:
-                    mplt.plot_B_obs(model, vec, model.m, oscillate=oscillate, dir_name=out_dir_T, title='T{0:.2f}yrs_'.format(Period)+'B-perturbation'+str(ind))
+                    mplt.plot_B_obs(model, vec, model.m, oscillate=oscillate, dir_name=out_dir_T, title=title+'_Bperturb')
                 logger.info('\t plotted ind={0}, T={1:.2f}yrs'.format(ind, Period))
             logger.info('run complete')
         except:
-            logger.info("Problem Plotting Eigenvalues: ", sys.exc_info()[0])
+            logger.error("Problem Plotting Eigenvalues.", exc_info=1)
+            break
