@@ -29,12 +29,12 @@ def plot_1D(model,vec,val,m,l):
         for (var,color) in zip(model.model_variables,colors):
              (out,bbound,tbound)=model.get_variable(vec,var)
              if ind == 0:
-                  line.append(ax.plot(th[1:-1]*180./np.pi,abs(out.T),color=color))
+                  line.append(ax.plot(th*180./np.pi,abs(out.T),color=color))
              elif ind ==1:
-                  ax.plot(th[1:-1]*180./np.pi,out.T.real,color=color)
+                  ax.plot(th*180./np.pi,out.T.real,color=color)
                   ax.grid()
              elif ind==2:
-                  ax.plot(th[1:-1]*180./np.pi,out.T.imag,color=color)
+                  ax.plot(th*180./np.pi,out.T.imag,color=color)
                   ax.grid()
         if ind ==0:
              labels = ['ur','uth','uph','br','bth','bph','p']
@@ -56,7 +56,7 @@ def plot_mollyweide(model,vec,val,m,l,v_scale=1.0):
    v_1D = model.get_variable(vec,'uth')[0][0]
    Nph = 2*Nl
    ph = np.linspace(-180.,180.-360./Nph,Nph)
-   lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
+   lon_grid, lat_grid = np.meshgrid(ph,th*180./np.pi-90.,)
    v = ((np.exp(1j*m*lon_grid*np.pi/180.).T*v_1D).T).real
    u = ((np.exp(1j*m*lon_grid*np.pi/180.).T*u_1D).T).real
    absu=u.real**2 + v.real**2
@@ -87,7 +87,7 @@ def plot_B_obs(model, vec, m, oscillate=False, dir_name='./', title='B-Perturbat
        Bobsth[::2] = Bobsth[::2]*-1
    Nph = 2*Nl
    ph = np.linspace(-180.,180.-360./Nph,Nph)
-   lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
+   lon_grid, lat_grid = np.meshgrid(ph,th*180./np.pi-90.,)
    Bobs = (np.exp(1j*m*lon_grid*np.pi/180.).T*Bobsth).T
 
    ### Plot Robinson Projection
@@ -119,7 +119,7 @@ def plot_robinson(model, vec, m, v_scale=1.0, oscillate=False, dir_name='./', ti
        v_1D[::2] = v_1D[::2]*-1
    Nph = 2*Nl
    ph = np.linspace(-180.,180.-360./Nph,Nph)
-   lon_grid, lat_grid = np.meshgrid(ph,th[1:-1]*180./np.pi-90.,)
+   lon_grid, lat_grid = np.meshgrid(ph,th*180./np.pi-90.,)
    v = (np.exp(1j*m*lon_grid*np.pi/180.).T*v_1D).T
    u = (np.exp(1j*m*lon_grid*np.pi/180.).T*u_1D).T
    absu=u**2 + v**2
@@ -191,8 +191,8 @@ def plot_pcolormesh_rth(model,val,vec,dir_name='./',title='pcolormesh MAC Wave P
     P_star = model.P_star
     B_star = model.B_star
     u_star = model.u_star
-    rpl = model.r[1:-1]*r_star/1e3
-    thpl = model.th[1:-1]*180./np.pi
+    rpl = model.r*r_star/1e3
+    thpl = model.th*180./np.pi
     fig = plt.figure(figsize=(14,14))
     fig.suptitle(title, fontsize=14)
     gs = gridspec.GridSpec(8, 2, width_ratios=[100, 1])
@@ -247,8 +247,8 @@ def plot_vel_AGU(model,vec,dir_name='./',title='Velocity for AGU', physical_unit
     P_star = model.P_star
     B_star = model.B_star
     u_star = model.u_star
-    rpl = model.r[1:-1]*r_star/1e3
-    thpl = model.th[1:-1]*180./np.pi
+    rpl = model.r*r_star/1e3
+    thpl = model.th*180./np.pi
     ur = model.get_variable(vec, 'ur', returnBC=False)*u_star
     ur[:,::2] = ur[:,::2]*-1
     urmax = np.amax(abs(ur))
@@ -309,14 +309,14 @@ def plot_buoy_struct(model, dir_name='./', title='buoyancy_structure'):
     drho = np.zeros((model.Nk,1))
     for i in range(1,model.Nk+1):
         drho[i-1] = sum(model.dr*model.r_star*drho_dr[1:i,model.Nl/2])
-    plt.plot(drho,((model.r[1:-1]-1)*model.r_star)/1000)
-#    plt.plot(drho_dr[1:-1,model.Nl/2]*1e6,(model.r[1:-1]-1)*model.r_star/1000)
+    plt.plot(drho,((model.r[:,0]-1)*model.r_star)/1000)
+#    plt.plot(drho_dr[:,model.Nl/2]*1e6,(model.r-1)*model.r_star/1000)
     plt.title('density perturbation off adiabat')
     plt.ylabel('depth below CMB (km)')
     plt.xlabel('density perturbation off adiabat (kg/m^4)')
 
     plt.subplot(1,2,2)
-    plt.plot(model.omega_g[1:-1,model.Nl/2]*model.t_star,(model.r[1:-1]-1)*model.r_star/1000)
+    plt.plot(model.omega_g[:,model.Nl/2]*model.t_star,(model.r[:,0]-1)*model.r_star/1000)
     plt.title('buoyancy frequency')
     plt.ylabel('depth below CMB (km)')
     plt.xlabel('buoyancy frequency (omega_g/Omega)')
@@ -328,7 +328,7 @@ def plot_B(model, dir_name='./', title='B field structure'):
     plt.close('all')
     fig = plt.figure(figsize=(10,10))
     plt.subplot(3,1,1)
-    plt.plot(model.th[1:-1]*180./np.pi,model.Br[model.Nk/2,1:-1]*model.B_star*1e3)
+    plt.plot(model.th[0,:]*180./np.pi,model.Br[model.Nk/2,:]*model.B_star*1e3)
     xmin, xmax = plt.xlim()
     if xmin > 0.0:
         plt.xlim(xmin=0.0)
@@ -337,13 +337,13 @@ def plot_B(model, dir_name='./', title='B field structure'):
     plt.xlabel('colatitude in degrees')
 
     plt.subplot(3,1,2)
-    plt.plot(model.th[1:-1]*180./np.pi,model.Bth[model.Nk/2,1:-1]*model.B_star*1e3)
+    plt.plot(model.th[0,:]*180./np.pi,model.Bth[model.Nk/2,:]*model.B_star*1e3)
     plt.title('B_theta background field')
     plt.ylabel('B_theta in (10^-3 T)')
     plt.xlabel('colatitude in degrees')
 
     plt.subplot(3,1,2)
-    plt.plot(model.th[1:-1]*180./np.pi,model.Bph[model.Nk/2,1:-1]*model.B_star*1e3)
+    plt.plot(model.th[0,:]*180./np.pi,model.Bph[model.Nk/2,:]*model.B_star*1e3)
     plt.title('B_phi background field')
     plt.ylabel('B_phi in (10^-3 T)')
     plt.xlabel('colatitude in degrees')
@@ -353,7 +353,7 @@ def plot_B(model, dir_name='./', title='B field structure'):
 def plot_Uphi(model, dir_name='./', title='Uphi structure'):
     plt.close('all')
     fig = plt.figure(figsize=(10,5))
-    plt.pcolor(model.th[1:-1]*180./np.pi,(model.r[1:-1]-1)*model.r_star/1000,model.Uphi[1:-1,1:-1]*model.u_star)
+    plt.pcolor(model.th*180./np.pi,(model.r-1)*model.r_star/1000,model.Uphi[:,:]*model.u_star)
     plt.colorbar()
     plt.title('Uphi background velocity field')
     plt.ylabel('depth below CMB (km)')

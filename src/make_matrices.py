@@ -5,13 +5,13 @@ import itertools as it
 import numpy as np
 import importlib
 
-# Import configuration file
+#%% Import configuration file
 sys.path.append('../config')
 config_file = sys.argv[1].rstrip('\.py')
 cfg = importlib.import_module(config_file)
-print "used config file {0}".format(config_file)
+print("used config file {0}".format(config_file))
 
-# Store constant parameters
+#%% Store constant parameters
 mlog = cfg.mlog
 R = cfg.R
 Omega = cfg.Omega
@@ -19,12 +19,11 @@ rho = cfg.rho
 mu_0 = cfg.mu_0
 g = cfg.g
 model_variables = cfg.model_variables
-boundary_variables = cfg.boundary_variables
 dir_suf = cfg.dir_suf
 ep = cfg.ep
 
 # create list of all combinations of iteratable parameters
-iter_param_names = ['m', 'Nk', 'Nl', 'h', 'nu', 'eta', 'dCyr', 'B_type', 'Bd', 'Br', 'Bth', 'const', 'Bmax', 'Bmin', 'sin_exp', 'Uphi', 'buoy_type', 'buoy_ratio', 'mac', 'Bnoise']
+iter_param_names = ['m', 'Nk', 'Nl', 'h', 'nu', 'eta', 'dCyr', 'B_type', 'Bd', 'Br', 'Bth', 'B_const', 'Bmax', 'Bmin', 'sin_exp', 'Uphi', 'buoy_type', 'N_nd', 'mac', 'Bnoise']
 iter_params = {}
 for name in iter_param_names:
     value = eval('cfg.'+name)
@@ -47,19 +46,19 @@ for c in combinations:
     Bd = c['Bd']
     Br = c['Br']
     Bth = c['Bth']
-    const = c['const']
+    B_const = c['B_const']
     Bmax = c['Bmax']
     Bmin = c['Bmin']
     sin_exp = c['sin_exp']
     buoy_type = c['buoy_type']
-    buoy_ratio = c['buoy_ratio']
+    N_nd = c['N_nd']
     mac = c['mac']
     Uphi = c['Uphi']
     Bnoise = c['Bnoise']
 
     # Directory name to save model
     dir_name = ('../data/k'+str(Nk) + '_l' + str(Nl) +
-                '_m{1:.0f}_nu{2:.0e}_{3:.0f}km_{7}G{4:.0f}_{6}B{5:.0f}{8}/'.format(dCyr, m, nu, h/1e3, buoy_ratio*100., Br*1e5, B_type, buoy_type, dir_suf))
+                '_m{1:.0f}_nu{2:.0e}_{3:.0f}km_{7}N{4:.0f}_{6}B{5:.0f}{8}/'.format(dCyr, m, nu, h/1e3, N_nd*100., Br*1e5, B_type, buoy_type, dir_suf))
     filemodel = 'model.p' # name of model in directory
     fileA = 'A' # name of A matrix data
     fileB = 'B' # name of M matrix data
@@ -70,10 +69,9 @@ for c in combinations:
     physical_constants = {'R': R, 'Omega': Omega, 'rho': rho,
                           'h': h, 'nu': nu, 'eta': eta,
                           'mu_0': mu_0, 'g': g}
-    model = mac.Model(model_variables, boundary_variables,
-                      model_parameters, physical_constants)
-    model.set_B_by_type(B_type=B_type, Bd=Bd, Br=Br, Bth=Bth, const=const, Bmax=Bmax, Bmin=Bmin, sin_exp=sin_exp, noise=Bnoise)
-    model.set_buoy_by_type(buoy_type=buoy_type, buoy_ratio=buoy_ratio)
+    model = mac.Model(model_variables, model_parameters, physical_constants)
+    model.set_B_by_type(B_type=B_type, Bd=Bd, Br=Br, Bth=Bth, B_const=B_const, Bmax=Bmax, Bmin=Bmin, sin_exp=sin_exp, noise=Bnoise)
+    model.set_buoy_by_type(buoy_type=buoy_type, N_nd=N_nd)
     if type(dCyr) == (float or int):
         model.set_CC_skin_depth(dCyr)
     model.set_Uphi(Uphi)
@@ -113,9 +111,8 @@ for c in combinations:
     'Bth = ' + str(model.Bth.max()) + ' to ' + str(model.Bth.min()) + '\n' +
     'Uph = ' + str(model.Uphi.max()) + ' to ' + str(model.Uphi.min()) + '\n' +
     'buoy_type = ' + str(buoy_type) + '\n' +
-    'buoy_ratio = ' + str(buoy_ratio) +'\n' +
-    'model variables = ' + str(model.model_variables) + '\n' +
-    'boundary variables = ' + str(model.boundary_variables)
+    'N_nd = ' + str(N_nd) +'\n' +
+    'model variables = ' + str(model.model_variables) + '\n'
     )
     print 'model will be saved in ' + str(dir_name)
 
@@ -143,8 +140,9 @@ for c in combinations:
     print 'saved PETSc B matrix ' + str(dir_name)
     model.make_A_noCCBC()
     print 'created A_noCCBC matrix'
-    model.set_CC_skin_depth(dCyr)
-    model.add_CCBC()
+    # model.set_CC_skin_depth(dCyr)
+    # model.add_CCBC()
+    model.A = model.A_noCCBC
     epA = np.min(np.abs(model.A.data[np.nonzero(model.A.data)]))*ep
     model.save_mat_PETSc(dir_name+fileA+str(dCyr)+'.dat', model.A.toPETSc(epsilon=epA))
     print 'saved PETSc A matrix for dCyr = {0} to '.format(dCyr) + str(dir_name)
