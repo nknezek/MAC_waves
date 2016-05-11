@@ -3,11 +3,6 @@ import numpy as np
 from numpy import sin, cos, tan
 class Model(macmodel.Model):
     def make_A(self):
-        self.make_A_noCCBC(self)
-        self.add_CCBC(self)
-        return self.A
-
-    def make_A_noCCBC(self):
         Nk = self.Nk
         Nl = self.Nl
         E = self.E
@@ -167,49 +162,9 @@ class Model(macmodel.Model):
         self.A_vals += self.rdisp.vals
         del self.rdisp
 
-        self.A_noCCBC = macmodel.coo_matrix((self.A_vals, (self.A_rows, self.A_cols)),
+        self.A = macmodel.coo_matrix((self.A_vals, (self.A_rows, self.A_cols)),
                                    shape=(self.SizeM, self.SizeM))
         del self.A_vals, self.A_rows, self.A_cols
-        return self.A_noCCBC
-
-    def add_CCBC(self):
-        # Conducting Core at CFB ####
-        Nk = self.Nk
-        Nl = self.Nl
-        E = self.E
-        Pm = self.Pm
-        delta_C = self.delta_C
-        r_star = self.r_star
-        Br = self.Br
-        dr = self.dr
-
-        self.add_gov_equation('CCBC', 'p')
-        for l in range(1, Nl+1):
-            row = {'k': 0, 'l': l, 'var': 'bth'}
-            self.CCBC.add_value(str(Br[0, l]/2.), row,
-                              {'k': 0, 'l': l, 'var': 'uth'})
-            self.CCBC.add_value(str(Br[1, l]/2.), row,
-                              {'k': 1, 'l': l, 'var': 'uth'})
-            self.CCBC.add_value(str(E/Pm*(-1/dr - r_star/(2*delta_C*(1+1j)))),
-                              row, {'k': 0, 'l': l, 'var': 'bth'})
-            self.CCBC.add_value(str(E/Pm*(1/dr - r_star/(2*delta_C*(1+1j)))),
-                              row, {'k': 1, 'l': l, 'var': 'bth'})
-        for l in range(1, Nl+1):
-            row = {'k': 0, 'l': l, 'var': 'bph'}
-            self.CCBC.add_value(str(Br[0, l]/2.), row,
-                              {'k': 0, 'l': l, 'var': 'uph'})
-            self.CCBC.add_value(str(Br[1, l]/2.), row,
-                              {'k': 1, 'l': l, 'var': 'uph'})
-            self.CCBC.add_value(str(E/Pm*(-1/dr - r_star/(2*delta_C*(1+1j)))),
-                              row, {'k': 0, 'l': l, 'var': 'bph'})
-            self.CCBC.add_value(str(E/Pm*(1/dr - r_star/(2*delta_C*(1+1j)))),
-                              row, {'k': 1, 'l': l, 'var': 'bph'})
-        data = np.concatenate((self.A_noCCBC.data, self.CCBC.vals))
-        rows = np.concatenate((self.A_noCCBC.row, self.CCBC.rows))
-        cols = np.concatenate((self.A_noCCBC.col, self.CCBC.cols))
-        self.A = macmodel.coo_matrix((data, (rows, cols)),
-                                   shape=(self.SizeM, self.SizeM))
-        del self.CCBC
         return self.A
 
     def make_B(self):
