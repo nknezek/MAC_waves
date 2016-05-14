@@ -152,30 +152,30 @@ def plot_A(A,m):
     plt.title('A,m='+str(m)+' matrix all terms (M*l*x = A*x)')
     plt.savefig('./output/m={0}/A_matrix_m={0}.png'.format(m))
     # plt.subplot(3,2,2)
-#   plt.spy(np.abs(A.todense().real))
-#   plt.grid()
-#   plt.title('A'+str(m)+' real')
-#
-#   plt.subplot(3,2,3)
-#   plt.spy(np.abs(A.todense().imag))
-#   plt.grid()
-#   plt.title('A'+str(m)+' imaginary')
-#
-#   A_pos = np.matrix(A.todense())
-#   A_pos[A.todense()<0.] = 0
-#   plt.subplot(3,2,4)
-#   plt.spy(np.abs(A_pos))
-#   plt.grid()
-#   plt.title('A'+str(m)+' positive')
-#
-#   A_neg = np.matrix(A.todense())
-#   A_neg[A.todense()>0.] = 0
-#   plt.subplot(3,2,5)
-#   plt.spy(np.abs(A_neg))
-#   plt.grid()
-#   plt.title('A'+str(m)+' negative')
-#   plt.tight_layout()
-#   plt.savefig('./output/m={0}/A_matrix_m={0}.png'.format(m))
+    # plt.spy(np.abs(A.todense().real))
+    # plt.grid()
+    # plt.title('A'+str(m)+' real')
+    #
+    # plt.subplot(3,2,3)
+    # plt.spy(np.abs(A.todense().imag))
+    # plt.grid()
+    # plt.title('A'+str(m)+' imaginary')
+    #
+    # A_pos = np.matrix(A.todense())
+    # A_pos[A.todense()<0.] = 0
+    # plt.subplot(3,2,4)
+    # plt.spy(np.abs(A_pos))
+    # plt.grid()
+    # plt.title('A'+str(m)+' positive')
+    #
+    # A_neg = np.matrix(A.todense())
+    # A_neg[A.todense()>0.] = 0
+    # plt.subplot(3,2,5)
+    # plt.spy(np.abs(A_neg))
+    # plt.grid()
+    # plt.title('A'+str(m)+' negative')
+    # plt.tight_layout()
+    # plt.savefig('./output/m={0}/A_matrix_m={0}.png'.format(m))
 
 def plot_M(M,m):
     plt.figure(figsize=(10,10))
@@ -183,7 +183,6 @@ def plot_M(M,m):
     plt.spy(np.abs(M.todense()))
     plt.grid()
     plt.savefig('./output/m={0}/M_matrix_m={0}.png'.format(m))
-
 
 def plot_pcolormesh_rth(model,val,vec,dir_name='./',title='pcolormesh MAC Wave Plot', physical_units = False, oscillate_values=False):
     plt.close('all')
@@ -238,6 +237,58 @@ def plot_pcolormesh_rth(model,val,vec,dir_name='./',title='pcolormesh MAC Wave P
     fig.tight_layout()
     plt.subplots_adjust(top=0.95)
 #    plt.show()
+    plt.savefig(dir_name+title+'.png')
+
+def plot_all(model, val, vec, dir_name='./', title='Observed Waves', physical_units=False,
+             oscillate_values=False):
+    plt.close('all')
+    r_star = model.r_star
+    P_star = model.P_star
+    B_star = model.B_star
+    u_star = model.u_star
+    rpl = model.r*r_star/1e3
+    thpl = model.th*180./np.pi
+
+    fig, axes = plt.subplots(8,2,sharey='row', figsize=(14,14))
+    fig.subplots_adjust(wspace=0.05, right=0.9)
+    fig.suptitle(title, fontsize=14)
+
+    for ind, var in enumerate(model.model_variables):
+        try:
+            var_data = model.get_variable(vec, var)
+            if oscillate_values:
+                var_data[:,::2] = var_data[:,::2]*-1
+            if physical_units:
+                if var in ['ur', 'uth', 'uph']:
+                    var_data = var_data*u_star*31556.926
+                    axes[ind,0].set_title(var+' real (km/yr)')
+                    axes[ind,1].set_title(var+' imag (km/yr)')
+                elif var in ['br', 'bth', 'bph']:
+                    var_data = var_data*B_star*1e3
+                    axes[ind,0].set_title(var+' real (mT)')
+                    axes[ind,1].set_title(var+' imag (mT)')
+                elif var == 'r_disp':
+                    var_data = var_data*r_star
+                    axes[ind,0].set_title(var+' real (m)')
+                    axes[ind,1].set_title(var+' imag (m)')
+                elif var == 'p':
+                    var_data = var_data*P_star
+                    axes[ind,0].set_title(var+' real (Pa)')
+                    axes[ind,1].set_title(var+' imag (Pa)')
+            else:
+                axes[ind,0].set_title(var+' real')
+                axes[ind,1].set_title(var+' imag')
+            var_max = np.amax(abs(var_data))
+            axes[ind,0].pcolormesh(thpl,rpl,var_data.real, cmap='RdBu',vmin=-var_max, vmax=var_max)
+            axes[ind,0].set_ylabel('radius (km)')
+            p = axes[ind,1].pcolormesh(thpl,rpl,var_data.imag, cmap='RdBu',vmin=-var_max, vmax=var_max)
+            axes[ind,1].get_yaxis().set_ticks([])
+            pos = axes[ind,1].get_position()
+            cbax = fig.add_axes([pos.x0+pos.width+0.01,pos.y0,.01,pos.height])
+            fig.colorbar(p, cax = cbax, format='%.0e', ticks=np.linspace(-var_max,var_max,4))
+        except:
+            pass
+
     plt.savefig(dir_name+title+'.png')
 
 def plot_vel_AGU(model,vec,dir_name='./',title='Velocity for AGU', physical_units = False, oscillate_values=False):

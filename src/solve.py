@@ -197,17 +197,9 @@ for cnum, c in enumerate(combinations):
             fvals, fvecs = mana.filter_by_equator_power(model, vals, vecs, equator_fraction=eq_split, var=eq_var)
             logger.info('\t{0} filtered eigenvalues to plot with power at equator, split={1:.1f}'.format(len(fvals), eq_split))
 
-            # Filter by dth
-            fvals, fvecs = mana.filter_by_D3sq(model, fvals, fvecs, dth_filter)
-            logger.info('\t{0} filtered eigenvalues to plot with max dth < {1:.1e}'.format(len(fvals), dth_filter))
-
-            # Filter by Second Derivative
-            fvals, fvecs = mana.filter_by_D3sq(model, fvals, fvecs, D3sq_filter)
-            logger.info('\t{0} filtered eigenvalues to plot with max D3sq < {1:.1e}'.format(len(fvals), D3sq_filter))
-
             # %% Filter by number of zeros in theta-direction
-            fvals, fvecs = mana.filter_by_theta_zeros(model, fvals, fvecs, cfg.zeros_wanted)
-            logger.info('\t{0} eigenvectors found with requested number of zeros'.format(len(fvecs)))
+            # fvals, fvecs = mana.filter_by_theta_zeros(model, fvals, fvecs, cfg.zeros_wanted)
+            # logger.info('\t{0} eigenvectors found with requested number of zeros'.format(len(fvecs)))
 
             # %% Filter by Quality Factor
             fvals, fvecs = mana.filter_by_Q(model, fvals, fvecs, cfg.min_Q)
@@ -250,7 +242,7 @@ for cnum, c in enumerate(combinations):
                 else:
                     title = ('T{1:.2f}yrs_Q{2:.2f}_{0:.0f}'.format(ind, Period, Q))
                 if plot_vel:
-                    mplt.plot_pcolormesh_rth(model, val, vec, dir_name=out_dir_T, title=title, physical_units=True, oscillate_values=oscillate)
+                    mplt.plot_all(model, val, vec, dir_name=out_dir_T, title=title, physical_units=True, oscillate_values=oscillate)
                 if plot_robinson:
                     mplt.plot_robinson(model, vec, model.m, oscillate=oscillate, dir_name=out_dir_T, title=str(ind)+'_T{0:.2f}yrs_'.format(Period)+'Divergence')
                 if plot_B_obs:

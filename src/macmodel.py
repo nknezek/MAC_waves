@@ -25,16 +25,15 @@ class Model():
 
         self.calculate_nondimensional_parameters()
         self.set_up_grid(self.R, self.h)
-        self.make_operators()
-        
+
     def set_up_grid(self, R, h):
-        '''
+        """
         Creates the r and theta coordinate vectors
         inputs:
             R: radius of outer core in m
             h: layer thickness in m
         outputs: None
-        '''
+        """
         self.R = R
         self.h = h
         self.Size_var = self.Nk*self.Nl
@@ -45,19 +44,19 @@ class Model():
         self.dr = (self.rmax-self.rmin)/(self.Nk)
         ones = np.ones((self.Nk,self.Nl))
         self.r = (ones.T*np.linspace(self.rmin+self.dr/2., self.rmax-self.dr/2.,num=self.Nk)).T # r value at center of each cell
-        self.rm = (ones.T*np.linspace(self.rmin+self.dr, self.rmax, num=self.Nk)).T # r value at plus border (top) of cell
-        self.rp = (ones.T*np.linspace(self.rmin, self.rmax-self.dr, num=self.Nk)).T # r value at minus border (bottom) of cell
+        self.rp = (ones.T*np.linspace(self.rmin+self.dr, self.rmax, num=self.Nk)).T # r value at plus border (top) of cell
+        self.rm = (ones.T*np.linspace(self.rmin, self.rmax-self.dr, num=self.Nk)).T # r value at minus border (bottom) of cell
         self.dth = np.pi/(self.Nl)
         self.th = ones*np.linspace(self.dth/2., np.pi-self.dth/2., num=self.Nl) # theta value at center of cell
-        self.thm = ones*np.linspace(self.dth, np.pi, num=self.Nl) # theta value at plus border (top) of cell
-        self.thp = ones*np.linspace(0,np.pi-self.dth, num=self.Nl)
+        self.thp = ones*np.linspace(self.dth, np.pi, num=self.Nl) # theta value at plus border (top) of cell
+        self.thm = ones*np.linspace(0,np.pi-self.dth, num=self.Nl)
         return None
 
     def calculate_nondimensional_parameters(self):
-        '''
+        """
         Calculates the non-dimensional parameters in model from the physical
         Cants.
-        '''
+        """
         self.t_star = 1/self.Omega  # seconds
         self.r_star = self.R  # meters
         self.P_star = self.rho*self.r_star**2/self.t_star**2
@@ -68,8 +67,8 @@ class Model():
         return None
 
     def set_Br(self, BrT):
-        ''' Sets the background r magnetic field in Tesla
-        BrT = Br values for each cell in Tesla'''
+        """ Sets the background r magnetic field in Tesla
+        BrT = Br values for each cell in Tesla"""
         if isinstance(BrT, (float, int)):
             self.BrT = np.ones((self.Nk, self.Nl))*BrT
         elif isinstance(BrT, np.ndarray):
@@ -79,8 +78,8 @@ class Model():
         self.Br = self.BrT/self.B_star
 
     def set_Bth(self, BthT):
-        ''' Sets the background phi magnetic field in Tesla
-        BthT = Bth values for each cell in Tesla'''
+        """ Sets the background phi magnetic field in Tesla
+        BthT = Bth values for each cell in Tesla"""
         if isinstance(BthT, (float, int)):
             self.BthT = np.ones((self.Nk, self.Nl))*BthT
         elif isinstance(BthT, np.ndarray):
@@ -90,8 +89,8 @@ class Model():
         self.Bth = self.BthT/self.B_star
 
     def set_Bph(self, BphT):
-        ''' Sets the background phi magnetic field in Tesla
-        BphT = Bph values for each cell in Tesla'''
+        """ Sets the background phi magnetic field in Tesla
+        BphT = Bph values for each cell in Tesla"""
         if isinstance(BphT, (float, int)):
             self.BphT = np.ones((self.Nk, self.Nl))*BphT
         elif isinstance(BphT, np.ndarray):
@@ -101,8 +100,8 @@ class Model():
         self.Bph = self.BphT/self.B_star
 
     def set_Br_dipole(self, Bd, B_const=0):
-        ''' Sets the background magnetic field to a dipole field with
-        Bd = dipole constant in Tesla '''
+        """ Sets the background magnetic field to a dipole field with
+        Bd = dipole constant in Tesla """
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk, self.Nl))*cos(self.th)*Bd + B_const
         self.Br = self.BrT/self.B_star
@@ -112,8 +111,8 @@ class Model():
         return None
 
     def set_B_dipole(self, Bd, B_const=0):
-        ''' Sets the background magnetic field to a dipole field with
-        Bd = dipole constant in Tesla '''
+        """ Sets the background magnetic field to a dipole field with
+        Bd = dipole constant in Tesla """
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk, self.Nl))*cos(self.th)*Bd + B_const
         self.Br = self.BrT/self.B_star
@@ -123,8 +122,8 @@ class Model():
         return None
 
     def set_B_abs_dipole(self, Bd, B_const=0):
-        ''' Sets the background magnetic Br and Bth field to the absolute value of a
-        dipole field with Bd = dipole constant in Tesla '''
+        """ Sets the background magnetic Br and Bth field to the absolute value of a
+        dipole field with Bd = dipole constant in Tesla """
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk, self.Nl))*abs(cos(self.th))*Bd + B_const
         self.Br = self.BrT/self.B_star
@@ -134,8 +133,8 @@ class Model():
         return None
 
     def set_B_dipole_absrsymth(self, Bd, B_const=0):
-        ''' Sets the background magnetic Br and Bth field to the absolute value of a
-        dipole field with Bd = dipole constant in Tesla '''
+        """ Sets the background magnetic Br and Bth field to the absolute value of a
+        dipole field with Bd = dipole constant in Tesla """
         self.Bd = Bd
         self.BrT = 2*np.ones((self.Nk, self.Nl))*abs(cos(self.th))*Bd + B_const
         self.Br = self.BrT/self.B_star
@@ -145,9 +144,9 @@ class Model():
         return None
 
     def set_Br_abs_dipole(self, Bd, B_const=0, noise=None, N=10000):
-        ''' Sets the background Br magnetic field the absolute value of a
+        """ Sets the background Br magnetic field the absolute value of a
         dipole with Bd = dipole constant in Tesla.
-        optionally, can offset the dipole by a constant with B_const or add numerical noise with noise '''
+        optionally, can offset the dipole by a constant with B_const or add numerical noise with noise """
         if noise:     
             from scipy.special import erf
             def folded_mean(mu, s):
@@ -175,7 +174,7 @@ class Model():
         return None
 
     def set_B_by_type(self, B_type, Bd=0.0, Br=0.0, Bth=0.0, Bph=0.0, B_const=0.0, Bmin=0.0, Bmax=0.0, sin_exp=2.5, noise=0.0):
-        ''' Sets the background magnetic field to given type.
+        """ Sets the background magnetic field to given type.
         B_type choices:
             * dipole : Br, Bth dipole; specify scalar dipole constant Bd (T)
             * abs_dipole : absolute value of dipole in Br and Bth, specify scalar Bd (T)
@@ -184,7 +183,7 @@ class Model():
             * constant_Br : constant Br, Bth=0; specify scalar Br (T)
             * set : specify array Br, Bth, and Bph values in (T)
             * dipole_absrsymth : absolute value of dipole in Br, symmetric in Bth, specify scalar Bd (T)
-        '''
+        """
         if B_type == 'dipole':
             self.set_B_dipole(Bd, B_const=B_const)
         elif B_type == 'dipoleBr':
@@ -209,18 +208,18 @@ class Model():
             raise ValueError('B_type not valid')
 
     def set_CC_skin_depth(self, period):
-        ''' sets the magnetic skin depth for conducting core BC
+        """ sets the magnetic skin depth for conducting core BC
         inputs:
             period = period of oscillation in years
         returns:
             delta_C = skin depth in (m)
-        '''
+        """
         self.delta_C = np.sqrt(2*self.eta/(2*np.pi/(period*365.25*24*3600)))
         self.physical_constants['delta_C'] = self.delta_C
         return self.delta_C
 
     def set_Uphi(self, Uphi):
-        '''Sets the background velocity field in m/s'''
+        """Sets the background velocity field in m/s"""
         if isinstance(Uphi, (float, int)):
             self.Uphi = np.ones((self.Nk, self.Nl))*Uphi
         elif isinstance(Uphi, np.ndarray):
@@ -231,7 +230,7 @@ class Model():
         return None
 
     def set_N(self, drho_dr=None, N=None):
-        '''Sets the buoyancy structure of the layer'''
+        """Sets the buoyancy structure of the layer"""
         if drho_dr:
             self.omega_g = np.sqrt(-self.g/self.rho*drho_dr)
             self.N = self.omega_g*self.t_star
@@ -252,7 +251,7 @@ class Model():
         self.N = self.omega_g*self.t_star
 
     def get_index(self, k, l, var):
-        '''
+        """
         Takes coordinates for a point, gives back index in matrix.
         inputs:
             k: k grid value from 1 to K (or 0 to K+1 for variables with
@@ -261,7 +260,7 @@ class Model():
             var: variable name in model_variables
         outputs:
             index of location in matrix
-        '''
+        """
         Nk = self.Nk
         Nl = self.Nl
         SizeM = self.SizeM
@@ -277,8 +276,8 @@ class Model():
         else:
             return Size_var*self.model_variables.index(var) + k + l*Nk
 
-    def get_variable(self, vector, var, returnBC=True):
-        '''
+    def get_variable(self, vector, var):
+        """
         Takes a flat vector and a variable name, returns the variable in a
         np.matrix and the bottom and top boundary vectors
         inputs:
@@ -287,7 +286,7 @@ class Model():
         outputs:
             if boundary exists: variable, bottom_boundary, top_boundary
             if no boundary exists: variable
-        '''
+        """
         Nk = self.Nk
         Nl = self.Nl
 
@@ -297,36 +296,21 @@ class Model():
             raise RuntimeError('vector given is not correct length in this \
                                model')
         else:
-            var_start = self.get_index(1, 1, var)
-            var_end = self.get_index(Nk, Nl, var)+1
+            var_start = self.get_index(0, 0, var)
+            var_end = self.get_index(Nk-1, Nl-1, var)+1
             variable = np.array(np.reshape(vector[var_start:var_end], (Nk, Nl), 'F'))
-            if var in self.boundary_variables:
-                bound_bot_start = self.get_index(0, 1, var)
-                bound_bot_end = self.get_index(0, Nl, var)+1
-                bound_top_start = self.get_index(Nk+1, 1, var)
-                bound_top_end = self.get_index(Nk+1, Nl, var)+1
-                bottom_boundary = np.array(np.reshape(vector[bound_bot_start:
-                                             bound_bot_end], (1, Nl)))
-                top_boundary = np.array(np.reshape(vector[bound_top_start:
-                                                 bound_top_end], (1, Nl)))
-                if returnBC:
-                    return variable, bottom_boundary, top_boundary
-                else:
-                    return variable
-            else:
-                return variable
+            return variable
 
-    def create_vector(self, variables, boundaries):
-        '''
-        Takes a set of variables and boundaries and creates a vector out of
+    def create_vector(self, variables):
+        """
+        Takes a set of variables and creates a vector out of
         them.
         inputs:
             variables: list of (Nk x Nl) matrices or vectors for each model
                 variable
-            boundaries: list of 2 X Nl matrices or vectors for each boundary
         outputs:
             vector of size (SizeM x 1)
-        '''
+        """
         Nk = self.Nk
         Nl = self.Nl
         vector = np.array([1])
@@ -334,12 +318,8 @@ class Model():
         # Check Inputs:
         if len(variables) != len(self.model_variables):
             raise RuntimeError('Incorrect number of variable vectors passed')
-        if len(boundaries) != len(self.boundary_variables):
-            raise RuntimeError('Incorrect number of boundary vectors passed')
         for var in variables:
             vector = np.vstack((vector, np.reshape(var, (Nk*Nl, 1))))
-        for bound in boundaries:
-            vector = np.vstack((vector, np.reshape(bound, (2*Nl, 1))))
         return np.array(vector[1:])
 
     def add_gov_equation(self, name, variable):
@@ -369,7 +349,7 @@ class Model():
         return vals, vecs
 
     def save_mat_PETSc(self, filename, mat, type='Binary'):
-        ''' Saves a Matrix in PETSc format '''
+        """ Saves a Matrix in PETSc format """
         if type == 'Binary':
             viewer = PETSc.Viewer().createBinary(filename, 'w')
         elif type == 'ASCII':
@@ -377,7 +357,7 @@ class Model():
         viewer(mat)
 
     def load_mat_PETSc(self, filename, type='Binary'):
-        ''' Loads and returns a Matrix stored in PETSc format '''
+        """ Loads and returns a Matrix stored in PETSc format """
         if type == 'Binary':
             viewer = PETSc.Viewer().createBinary(filename, 'r')
         elif type == 'ASCII':
@@ -385,7 +365,7 @@ class Model():
         return PETSc.Mat().load(viewer)
 
     def save_vec_PETSc(self, filename, vec, type='Binary'):
-        ''' Saves a vector in PETSc format '''
+        """ Saves a vector in PETSc format """
         if type == 'Binary':
             viewer = PETSc.Viewer().createBinary(filename, 'w')
         elif type == 'ASCII':
@@ -393,7 +373,7 @@ class Model():
         viewer(vec)
 
     def load_vec_PETSc(self, filename, type='Binary'):
-        ''' Loads and returns a vector stored in PETSc format '''
+        """ Loads and returns a vector stored in PETSc format """
         if type == 'Binary':
             viewer = PETSc.Viewer().createBinary(filename, 'r')
         elif type == 'ASCII':
@@ -401,7 +381,7 @@ class Model():
         return PETSc.Mat().load(viewer)
 
     def save_model(self, filename):
-        ''' Saves the model structure without the computed A and M matrices'''
+        """ Saves the model structure without the computed A and M matrices"""
         try:
             self.A
         except:
@@ -432,48 +412,6 @@ class Model():
         else:
             self.M = M
 
-    def make_D3sqMat(self):
-        self.D3sq_rows = []
-        self.D3sq_cols = []
-        self.D3sq_vals = []
-        for var in self.boundary_variables:
-            self.add_gov_equation('D3sq_'+var, var)
-            exec('self.D3sq_'+var+'.add_D3sq(\''+var+'\','+str(self.m)+')')
-            exec('self.D3sq_rows = self.D3sq_'+var+'.rows')
-            exec('self.D3sq_cols = self.D3sq_'+var+'.cols')
-            exec('self.D3sq_vals = self.D3sq_'+var+'.vals')
-        self.D3sqMat = coo_matrix((self.D3sq_vals, (self.D3sq_rows, self.D3sq_cols)),
-                               shape=(self.SizeM, self.SizeM))
-        return self.D3sqMat
-
-    def make_dthMat(self):
-        self.dth_rows = []
-        self.dth_cols = []
-        self.dth_vals = []
-        for var in self.boundary_variables:
-            self.add_gov_equation('dth_'+var, var)
-            exec('self.dth_'+var+'.add_dth(\''+var+'\','+str(self.m)+')')
-            exec('self.dth_rows += self.dth_'+var+'.rows')
-            exec('self.dth_cols += self.dth_'+var+'.cols')
-            exec('self.dth_vals += self.dth_'+var+'.vals')
-        self.dthMat = coo_matrix((self.dth_vals, (self.dth_rows, self.dth_cols)),
-                              shape=(self.SizeM, self.SizeM))
-        return self.dthMat
-
-    def make_dphMat(self):
-        self.dph_rows = []
-        self.dph_cols = []
-        self.dph_vals = []
-        for var in self.boundary_variables:
-            self.add_gov_equation('dth_'+var, var)
-            exec('self.dph_'+var+'.add_dth(\''+var+'\','+str(self.m)+')')
-            exec('self.dph_rows += self.dth_'+var+'.rows')
-            exec('self.dph_cols += self.dth_'+var+'.cols')
-            exec('self.dph_vals += self.dth_'+var+'.vals')
-        self.dthMat = coo_matrix((self.dph_vals, (self.dph_rows, self.dph_cols)),
-                              shape=(self.SizeM, self.SizeM))
-        return self.dphMat
-
     def make_Bobs(self):
         BrobsT = 2*np.ones((self.Nk, self.Nl))*cos(self.th)
         self.Brobs = BrobsT/self.B_star
@@ -488,10 +426,10 @@ class Model():
         return self.BobsMat
 
     def make_operators(self):
-        '''
+        """
 
         :return:
-        '''
+        """
         dr = self.dr
         r = self.r
         rp = self.rp
@@ -503,6 +441,7 @@ class Model():
         Nk = self.Nk
         Nl = self.Nl
         m = self.m
+        delta_C = self.delta_C/self.r_star
 
         # ddr
         self.ddr_kp1 = rp**2/(2*r**2*dr)
@@ -510,20 +449,28 @@ class Model():
         self.ddr = 1/r
 
         self.ddr_kp1_b0 = np.array(self.ddr_kp1)
-        self.ddr_kp1_b0[-1,:] = np.zeros((1,Nl))
         self.ddr_km1_b0 = np.array(self.ddr_km1)
-        self.ddr_km1_b0[0,:] = np.zeros((1,Nl))
         self.ddr_b0 = np.array(self.ddr)
-        self.ddr_b0[-1,:] = (1/r - rp**2/(2*r**2*dr))[-1,:]
-        self.ddr_b0[0,:] = (1/r + rm**2/(2*r**2*dr))[0,:]
+        self.ddr_kp1_b0[-1,:] = np.zeros(Nl)
+        self.ddr_b0[-1,:] = -rm[-1,:]**2/(2*r[-1,:]**2*dr)
+        self.ddr_km1_b0[0,:] = np.zeros(Nl)
+        self.ddr_b0[0,:] = rp[0,:]**2/(2*r[0,:]**2*dr)
 
         self.ddr_kp1_bd0 = np.array(self.ddr_kp1)
-        self.ddr_kp1_bd0[-1,:] = np.zeros((1,Nl))
         self.ddr_km1_bd0 = np.array(self.ddr_km1)
-        self.ddr_km1_bd0[0,:] = np.zeros((1,Nl))
         self.ddr_bd0 = np.array(self.ddr)
-        self.ddr_bd0[-1,:] = (1/r + rp**2/(2*r**2*dr))[-1,:]
-        self.ddr_bd0[0,:] = (1/r - rm**2/(2*r**2*dr))[0,:]
+        self.ddr_kp1_bd0[-1,:] = np.zeros(Nl)
+        self.ddr_bd0[-1,:] = (2*rp[-1,:]**2 -rm[-1,:]**2)/(2*r[-1,:]**2*dr)
+        self.ddr_km1_bd0[0,:] = np.zeros(Nl)
+        self.ddr_bd0[0,:] = (rp[0,:]**2 - 2*rm[0,:]**2)/(2*r[0,:]**2*dr)
+
+        # ddr for Conducting core boundary conditions
+        self.ddr_kp1_ccb = np.array(self.ddr_kp1_bd0)
+        self.ddr_kp1_ccb[0,:] = 1/r[0,:]
+        self.ddr_km1_ccb = np.array(self.ddr_km1_bd0)
+        self.ddr_km1_ccb[0,:] = np.zeros(Nl)
+        self.ddr_ccb = np.array(self.ddr_bd0)
+        self.ddr_ccb = np.ones(Nl)/dr
 
         # ddth
         self.ddth_lp1 = sin(thp)/(2*r*sin(th)*dth)
@@ -535,19 +482,21 @@ class Model():
 
         # drP
         self.drP_kp1 = rp**2/(2*dr*r**2)
-        self.drP_kp1[-1,:] = np.zeros((1,Nl))
         self.drP_km1 = -rm**2/(2*dr*r**2)
-        self.drP_km1[0,:] = np.zeros((1,Nl))
-        self.drP_lp1 = -sin(thp)/(2*r*sin(th)*dth)
-        self.drP_lm1 = -sin(thm)/(2*r*sin(th)*dth)
+        self.drP_lp1 = -sin(thp)/(4*r*sin(th))
+        self.drP_lm1 = -sin(thm)/(4*r*sin(th))
         self.drP = -(sin(thp)+sin(thm))/(4*r*sin(th))
-        self.drP[-1,:] = np.ones((1,Nl))*(rp**2/(2*dr*r**2) - (sin(thp) + sin(thm))/(4*r*sin(th)))[-1,:]
-        self.drP[0,:] = np.ones((1,Nl))*(-rm**2/(2*dr*r**2) - (sin(thp) + sin(thm))/(4*r*sin(th)))[0,:]
+        self.drP_kp1[-1,:] = np.zeros(Nl)
+        self.drP[-1,:] = rp[-1,:]**2/(2*dr*r[-1,:]**2) \
+                         - (sin(thp[-1,:]) + sin(thm[-1,:]))/(4*r[-1,:]*sin(th[-1,:]))
+        self.drP_km1[0,:] = np.zeros(Nl)
+        self.drP[0,:] = -rm[0,:]**2/(2*dr*r[0,:]**2) \
+                        - (sin(thp[0,:]) + sin(thm[0,:]))/(4*r[0,:]*sin(th[0,:]))
 
         # dthP
         self.dthP_lp1 = sin(thp)/(2*r*sin(th)*dth)
         self.dthP_lm1 = -sin(thm)/(2*r*sin(th)*dth)
-        self.dthP = ((sin(thp)-sin(thm))/(2*r*sin(th)*dth) - cos(th)/(r*sin(th)))
+        self.dthP = (sin(thp)-sin(thm))/(2*r*sin(th)*dth) - cos(th)/(r*sin(th))
 
         # dphP
         self.dphP = 1j*m/(r*sin(th))
@@ -555,32 +504,42 @@ class Model():
         # Laplacian
         self.d2_kp1 = (rp/r/dr)**2
         self.d2_km1 = (rm/r/dr)**2
-        self.d2_lp1 = (sin(thp)/(sin(th)*r*dth))**2
-        self.d2_lm1 = (sin(thm)/(sin(th)*r*dth))**2
-        self.d2 = -((rp**2+rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*r*dth)**2 + (m/(r*sin(th)))**2)
+        self.d2_lp1 = sin(thp)/(sin(th)*(r*dth)**2)
+        self.d2_lm1 = sin(thm)/(sin(th)*(r*dth)**2)
+        self.d2 = -((rp**2+rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*(r*dth)**2) + (m/(r*sin(th)))**2)
 
         # Laplacian for B.C. var = 0
         self.d2_kp1_b0 = np.array(self.d2_kp1)
-        self.d2_kp1_b0[-1,:] = np.zeros((1,Nl))
         self.d2_km1_b0 = np.array(self.d2_km1)
-        self.d2_km1_b0[0,:] = np.zeros((1,Nl))
         self.d2_lp1_b0 = self.d2_lp1
         self.d2_lm1_b0 = self.d2_lm1
         self.d2_b0 = np.array(self.d2)
-        self.d2_b0[-1,:] = (-((2*rp**2+rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*r*dth)**2 + (m/(r*sin(th)))**2))[-1,:]
-        self.d2_b0[0,:] = (-((rp**2+2*rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*r*dth)**2 + (m/(r*sin(th)))**2))[0,:]
+        self.d2_kp1_b0[-1,:] = np.zeros(Nl)
+        self.d2_b0[-1,:] = (-((2*rp**2+rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*(r*dth)**2) + (m/(r*sin(th)))**2))[-1,:]
+        self.d2_km1_b0[0,:] = np.zeros(Nl)
+        self.d2_b0[0,:] = (-((rp**2+2*rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*(r*dth)**2) + (m/(r*sin(th)))**2))[0,:]
 
         # Laplacian for B.C. d(var)/dr = 0
         self.d2_kp1_bd0 = np.array(self.d2_kp1)
-        self.d2_kp1_bd0[-1,:] = np.zeros((1,Nl))
         self.d2_km1_bd0 = np.array(self.d2_km1)
-        self.d2_km1_bd0[0,:] = np.zeros((1,Nl))
         self.d2_lp1_bd0 = self.d2_lp1
         self.d2_lm1_bd0 = self.d2_lm1
         self.d2_bd0 = np.array(self.d2)
-        self.d2_bd0[-1,:] = (-((rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*r*dth)**2 + (m/(r*sin(th)))**2))[-1,:]
-        self.d2_bd0[0,:] = (-((rp**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*r*dth)**2 + (m/(r*sin(th)))**2))[0,:]
+        self.d2_kp1_bd0[-1,:] = np.zeros(Nl)
+        self.d2_bd0[-1,:] = (-((rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*(r*dth)**2) + (m/(r*sin(th)))**2))[-1,:]
+        self.d2_km1_bd0[0,:] = np.zeros(Nl)
+        self.d2_bd0[0,:] = (-((rp**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*(r*dth)**2) + (m/(r*sin(th)))**2))[0,:]
 
+        # Laplacian for conducting-core boundary (ccb), derivative=0  (bth, bph terms)
+        self.d2_kp1_ccb0 = np.array(self.d2_kp1_b0)
+        self.d2_kp1_ccb0[0,:] = (rp[0,:]/r[0,:]/dr)**2 + rm[0,:]**2/(2*r[0,:]**2*dr*delta_C)
+        self.d2_km1_ccb0 = self.d2_km1_b0
+        self.d2_lp1_ccb0 = self.d2_lp1
+        self.d2_lm1_ccb0 = self.d2_lm1
+        self.d2_ccb0 = np.array(self.d2_b0)
+        self.d2_ccb0[0,:] = (-(rp[0,:]/r[0,:]/dr)**2 - 3*rm[0,:]**2/2*r[0,:]**2*dr*delta_C
+                                - (sin(thp[0,:]) + sin(thm[0,:]))/(sin(th[0,:])*r[0,:]**2*dth**2)
+                                - (m/(r[0,:]*sin(th[0,:])))**2)
         #%% d2r
         self.d2r_thlp1  = - self.ddth_lp1/r
         self.d2r_thlm1  = - self.ddth_lm1/r
@@ -608,7 +567,7 @@ class GovEquation():
         self.model = model
 
     def add_term(self, var, values, kdiff=0, ldiff=0, mdiff=0, k_vals=None, l_vals=None):
-        ''' Adds a term to the governing equation.
+        """ Adds a term to the governing equation.
         By default, iterates over 1 < k < Nk and 1 < l < Nl
         with kdiff = ldiff = mdiff = 0
         inputs:
@@ -621,7 +580,7 @@ class GovEquation():
             list l_vals: list of int l values to iterate over
         output:
             none
-        '''
+        """
 
         Nk = self.model.Nk
         Nl = self.model.Nl
@@ -643,17 +602,21 @@ class GovEquation():
                     self.vals.append(values[k,l])
 
     def add_value(self, value, row, col):
-        '''
+        """
         Adds a term to a specific index.
         value: term to add
         row: dictionary containing 'k','l',and 'var'
         col: dictionary containing 'k','l',and 'var'
-        '''
+        """
         self.rows.append(self.model.get_index(row['k'], row['l'], row['var']))
         self.cols.append(self.model.get_index(col['k'], col['l'], col['var']))
         self.vals.append(eval(value, globals(), locals()))
 
     def add_dr_b0(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :return:
+        """
         self.add_term(var, C*self.model.ddr_kp1_b0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.ddr_km1_b0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.ddr_b0, k_vals=k_vals, l_vals=l_vals)
@@ -662,6 +625,15 @@ class GovEquation():
         self.add_term(var, C*self.model.ddr_kp1_bd0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.ddr_km1_bd0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.ddr_bd0, k_vals=k_vals, l_vals=l_vals)
+
+    def add_dr_ccb(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :return:
+        """
+        self.add_term(var, C*self.model.ddr_kp1_ccb, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_km1_ccb, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_ccb, k_vals=k_vals, l_vals=l_vals)
 
     def add_dth(self, var, C=1, k_vals=None, l_vals=None):
         self.add_term(var, C*self.model.ddth_lp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
@@ -700,80 +672,84 @@ class GovEquation():
         self.add_term(var, C*self.model.d2_lm1_bd0, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.d2_bd0, k_vals=k_vals, l_vals=l_vals)
 
+    def add_d2_ccb0(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.d2_kp1_ccb0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_km1_ccb0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lp1_ccb0, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lm1_ccb0, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_ccb0, k_vals=k_vals, l_vals=l_vals)
+
     def add_d2r_th(self, var, C=1., k_vals=None, l_vals=None):
-        '''
+        """
 
         :param var:
         :param C:
         :param k_vals:
         :param l_vals:
         :return:
-        '''
+        """
         self.add_term(var, C*self.model.d2r_thlp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.d2r_thlm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.d2r_th, k_vals=k_vals, l_vals=l_vals)
 
     def add_d2r_ph(self, var, C=1., k_vals=None, l_vals=None):
-        '''
+        """
 
         :param var:
         :param C:
         :param k_vals:
         :param l_vals:
         :return:
-        '''
+        """
         self.add_term(var, C*self.model.d2r_ph, k_vals=k_vals, l_vals=l_vals)
 
     def add_d2th_r(self, var, C=1., k_vals=None, l_vals=None):
-        '''
+        """
 
         :param var:
         :param C:
         :param k_vals:
         :param l_vals:
         :return:
-        '''
+        """
         self.add_term(var, C*self.model.d2th_rlp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.d2th_rlm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.d2th_r, k_vals=k_vals, l_vals=l_vals)
 
     def add_d2th_ph(self, var, C=1., k_vals=None, l_vals=None):
-        '''
+        """
 
         :param var:
         :param C:
         :param k_vals:
         :param l_vals:
         :return:
-        '''
+        """
         self.add_term(var, C*self.model.d2th_ph, k_vals=k_vals, l_vals=l_vals)
 
     def add_d2ph_r(self, var, C=1., k_vals=None, l_vals=None):
-        '''
+        """
 
         :param var:
         :param C:
         :param k_vals:
         :param l_vals:
         :return:
-        '''
+        """
         self.add_term(var, C*self.model.d2ph_rlp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.d2ph_rlm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.d2ph_r, k_vals=k_vals, l_vals=l_vals)
 
     def add_d2ph_th(self, var, C=1., k_vals=None, l_vals=None):
-        '''
+        """
 
         :param var:
         :param C:
         :param k_vals:
         :param l_vals:
         :return:
-        '''
+        """
         self.add_term(var, C*self.model.d2ph_th, k_vals=k_vals, l_vals=l_vals)
-
-    def add_bc(self, var, C=1. , l_vals=None):
-
 
     def get_coo_matrix(self):
         return coo_matrix((self.vals, (self.rows, self.cols)),
@@ -787,7 +763,7 @@ class GovEquation():
         return self.get_coo_matrix().todense()
 
 class csr_matrix(scipy.sparse.csr.csr_matrix):
-    ''' Subclass to allow conversion to PETSc matrix format'''
+    """ Subclass to allow conversion to PETSc matrix format"""
     def toPETSc(self, epsilon=1e-12):
         ind = self.nonzero()
         Mat = PETSc.Mat().createAIJ(size=self.shape)
@@ -802,13 +778,13 @@ class csr_matrix(scipy.sparse.csr.csr_matrix):
         return Mat
 
     def tocoo(self, copy=True):
-        '''Overridden method to allow converstion to PETsc matrix
+        """Overridden method to allow converstion to PETsc matrix
 
         Original Documentation:
         Return a COOrdinate representation of this matrix
 
         When copy=False the index and data arrays are not copied.
-        '''
+        """
         major_dim, minor_dim = self._swap(self.shape)
         data = self.data
         minor_indices = self.indices
@@ -823,7 +799,7 @@ class csr_matrix(scipy.sparse.csr.csr_matrix):
         return coo_matrix((data, (row, col)), self.shape)
 
 class coo_matrix(scipy.sparse.coo.coo_matrix):
-    ''' Subclass to allow conversion to PETSc matrix format'''
+    """ Subclass to allow conversion to PETSc matrix format"""
     def toPETSc(self, epsilon=1e-12):
         csr_mat = self.tocsr()
         ind = csr_mat.nonzero()
@@ -854,7 +830,7 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
         return Mat
 
     def tocsr(self):
-        '''Overridden method to return csr matrix with toPETsc function
+        """Overridden method to return csr matrix with toPETsc function
 
         Original Documentation:
         Return a copy of this matrix in Compressed Sparse Row format
@@ -875,7 +851,7 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
                [0, 0, 0, 0],
                [0, 0, 0, 1]])
 
-        '''
+        """
         from scipy.sparse.sputils import get_index_dtype
         
         if self.nnz == 0:
