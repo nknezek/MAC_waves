@@ -70,40 +70,40 @@ class Model():
         ''' Sets the background phi magnetic field in Tesla
         BrT = Br values for each cell in Tesla'''
         if isinstance(BrT, (float, int)):
-            self.BrT = np.ones((self.Nk+2, self.Nl+2))*BrT
-        elif isinstance(BrT, np.ndarray):
+            self.BrT = np.ones((self.Nk+2, self.Nl))*BrT
+            self.Br = self.BrT/self.B_star
+        elif isinstance(BrT, np.ndarray) and BrT.shape == (self.Nk+2, self.Nl):
             self.Br = self.BrT/self.B_star
         else:
-            raise TypeError("BrT must either be an int, float, or np.ndarray")
-        self.Br = self.BrT/self.B_star
+            raise TypeError("BrT must either be an int, float, or np.ndarray of correct size")
 
     def set_Bth(self, BthT):
         ''' Sets the background phi magnetic field in Tesla
         BthT = Bth values for each cell in Tesla'''
         if isinstance(BthT, (float, int)):
-            self.BthT = np.ones((self.Nk+2, self.Nl+2))*BthT
-        elif isinstance(BthT, np.ndarray):
+            self.BthT = np.ones((self.Nk+2, self.Nl))*BthT
+            self.Bth = self.BthT/self.B_star
+        elif isinstance(BthT, np.ndarray) and BthT.shape == (self.Nk+2, self.Nl) :
             self.Bth = self.BthT/self.B_star
         else:
-            raise TypeError("BthT must either be an int, float, or np.ndarray")
-        self.Bth = self.BthT/self.B_star
+            raise TypeError("BthT must either be an int, float, or np.ndarray of correct size")
 
     def set_Bph(self, BphT):
         ''' Sets the background phi magnetic field in Tesla
         BphT = Bph values for each cell in Tesla'''
         if isinstance(BphT, (float, int)):
-            self.BphT = np.ones((self.Nk+2, self.Nl+2))*BphT
-        elif isinstance(BphT, np.ndarray):
+            self.BphT = np.ones((self.Nk+2, self.Nl))*BphT
+            self.Bph = self.BphT/self.B_star
+        elif isinstance(BphT, np.ndarray) and BphT.shape ==(self.Nk+2, self.Nl):
             self.Bph = self.BphT/self.B_star
         else:
-            raise TypeError("BphT must either be an int, float, or np.ndarray")
-        self.Bph = self.BphT/self.B_star
+            raise TypeError("BphT must either be an int, float, or np.ndarray of correct size")
 
     def set_Br_dipole(self, Bd, const=0):
         ''' Sets the background magnetic field to a dipole field with
         Bd = dipole constant in Tesla '''
         self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)*Bd + const
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl))*cos(self.th)*Bd + const
         self.Br = self.BrT/self.B_star
         self.set_Bth(0.0)
         self.set_Bph(0.0)
@@ -114,9 +114,9 @@ class Model():
         ''' Sets the background magnetic field to a dipole field with
         Bd = dipole constant in Tesla '''
         self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)*Bd + const
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl))*cos(self.th)*Bd + const
         self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl+2))*sin(self.th)*Bd + const
+        self.BthT = np.ones((self.Nk+2, self.Nl))*sin(self.th)*Bd + const
         self.Bth = self.BthT/self.B_star
         self.set_Bph(0.0)
         return None
@@ -125,9 +125,9 @@ class Model():
         ''' Sets the background magnetic Br and Bth field to the absolute value of a
         dipole field with Bd = dipole constant in Tesla '''
         self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl))*abs(cos(self.th))*Bd + const
         self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl+2))*abs(sin(self.th))*Bd + const
+        self.BthT = np.ones((self.Nk+2, self.Nl))*abs(sin(self.th))*Bd + const
         self.Bth = self.BthT/self.B_star
         self.set_Bph(0.0)
         return None
@@ -136,9 +136,9 @@ class Model():
         ''' Sets the background magnetic Br and Bth field to the absolute value of a
         dipole field with Bd = dipole constant in Tesla '''
         self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
+        self.BrT = 2*np.ones((self.Nk+2, self.Nl))*abs(cos(self.th))*Bd + const
         self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl+2))*sin(self.th)*Bd + const
+        self.BthT = np.ones((self.Nk+2, self.Nl))*sin(self.th)*Bd + const
         self.Bth = self.BthT/self.B_star
         self.set_Bph(0.0)
         return None
@@ -156,18 +156,18 @@ class Model():
             Bdip_noise = np.zeros_like(Bdip)
             for (i,B) in enumerate(Bdip):
                 Bdip_noise[i] = folded_mean(Bdip[i], noise)
-            self.BrT = np.ones((self.Nk+2, self.Nl+2))*Bdip_noise
+            self.BrT = np.ones((self.Nk+2, self.Nl))*Bdip_noise
             self.Br = self.BrT/self.B_star
         else:
             self.Bd = Bd
-            self.BrT = 2*np.ones((self.Nk+2, self.Nl+2))*abs(cos(self.th))*Bd + const
+            self.BrT = 2*np.ones((self.Nk+2, self.Nl))*abs(cos(self.th))*Bd + const
             self.Br = self.BrT/self.B_star
         self.set_Bth(0.0)
         self.set_Bph(0.0)
         return None
 
     def set_Br_sinfunc(self, Bmin, Bmax, sin_exp=2.5):
-        self.BrT = np.ones((self.Nk+2, self.Nl+2))*((1-sin(self.th)**sin_exp)*(Bmax-Bmin)+Bmin)
+        self.BrT = np.ones((self.Nk+2, self.Nl))*((1-sin(self.th)**sin_exp)*(Bmax-Bmin)+Bmin)
         self.Br = self.BrT/self.B_star
         self.set_Bth(0.0)
         self.set_Bph(0.0)
@@ -189,8 +189,9 @@ class Model():
         elif B_type == 'dipoleBr':
             self.set_Br_dipole(Bd, const=const)
         elif B_type == 'constantBr':
-            self.set_Br(Br*np.ones((self.Nk+2, self.Nl+2)))
-            self.set_Bth(0.0*np.ones((self.Nk+2, self.Nl+2)))
+            self.set_Br(Br*np.ones((self.Nk+2, self.Nl)))
+            self.set_Bth(0.0)
+            self.set_Bph(0.0)
         elif B_type == 'set':
             self.set_Br(Br)
             self.set_Bth(Bth)
