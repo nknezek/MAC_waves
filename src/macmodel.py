@@ -480,9 +480,9 @@ class Model():
         gradBrobsT = -2*np.ones((self.Nk+2, self.Nl))*sin(self.th)/self.R
         self.gradBrobs = gradBrobsT/self.B_star*self.r_star
         self.add_gov_equation('Bobs', 'ur')
-        self.Bobs.add_term('uth', 'self.model.gradBrobs[k,l]')
-        self.Bobs.add_Dth('uth', 'self.model.Brobs[k,l]')
-        self.Bobs.add_Dph('uph', 'self.model.Brobs[k,l]')
+        self.Bobs.add_term('uth', self.model.gradBrobs)
+        self.Bobs.add_dth('uth', C= self.model.Brobs)
+        self.Bobs.add_dph('uph', C= self.model.Brobs)
         self.BobsMat = coo_matrix((self.Bobs.vals, (self.Bobs.rows, self.Bobs.cols)),
                                   shape=(self.SizeM, self.SizeM))
         return self.BobsMat
