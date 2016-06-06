@@ -261,7 +261,7 @@ class Model():
 
         if (var not in self.model_variables):
             raise RuntimeError('variable not in model_variables')
-        elif not (l >= 1 and l <= Nl):
+        elif not (l >= 0 and l <= Nl-1):
             raise RuntimeError('l index out of bounds')
         elif not ((k >= 1 and k <= Nk) or ((k == 0 or k == Nk+1) and var in
                   self.boundary_variables)):
@@ -273,9 +273,9 @@ class Model():
                 elif k == Nk+1:
                     k_bound = 1
                 return SizeMnoBC + Nl*2*self.boundary_variables.index(var) +\
-                    k_bound*Nl + (l-1)
+                    k_bound*Nl + l
             else:
-                return Size_var*self.model_variables.index(var) + (k-1) + (l-1)*Nk
+                return Size_var*self.model_variables.index(var) + (k-1) + l*Nk
 
     def get_variable(self, vector, var, returnBC=True):
         '''
@@ -584,7 +584,7 @@ class GovEquation():
         Nl = self.model.Nl
 
         if l_vals is None:
-            l_vals = range(max(0,-ldiff),Nl+min(0,-ldiff))
+            l_vals = range(max(0,-ldiff),Nl-1+min(0,-ldiff))
         if k_vals is None:
             k_vals = range(1,Nk+1)
 
