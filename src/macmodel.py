@@ -485,6 +485,75 @@ class Model():
                                   shape=(self.SizeM, self.SizeM))
         return self.BobsMat
 
+    def make_operators(self):
+        """
+
+        :return:
+        """
+        dr = self.dr
+        r = self.r
+        rp = self.rp
+        rm = self.rm
+        dth = self.dth
+        th = self.th
+        thm = self.thm
+        thp = self.thp
+        Nk = self.Nk
+        Nl = self.Nl
+        m = self.m
+        delta_C = self.delta_C/self.r_star
+
+        # ddr
+        self.ddr_kp1 = rp**2/(2*r**2*dr)
+        self.ddr_km1 = -rm**2/(2*r**2*dr)
+        self.ddr = 1/r
+
+        # ddth
+        self.ddth_lp1 = sin(thp)/(2*r*sin(th)*dth)
+        self.ddth_lm1 = -sin(thm)/(2*r*sin(th)*dth)
+        self.ddth = (sin(thp)-sin(thm))/(2*r*sin(th)*dth)
+
+        # ddph
+        self.ddph = 1j*m/(r*sin(th))
+
+        # drP
+        self.drP_kp1 = rp**2/(2*dr*r**2)
+        self.drP_km1 = -rm**2/(2*dr*r**2)
+        self.drP_lp1 = -sin(thp)/(4*r*sin(th))
+        self.drP_lm1 = -sin(thm)/(4*r*sin(th))
+        self.drP = -(sin(thp)+sin(thm))/(4*r*sin(th))
+
+        # dthP
+        self.dthP_lp1 = sin(thp)/(2*r*sin(th)*dth)
+        self.dthP_lm1 = -sin(thm)/(2*r*sin(th)*dth)
+        self.dthP = (sin(thp)-sin(thm))/(2*r*sin(th)*dth) - cos(th)/(r*sin(th))
+
+        # dphP
+        self.dphP = 1j*m/(r*sin(th))
+
+        # Laplacian
+        self.d2_kp1 = (rp/(r*dr))**2
+        self.d2_km1 = (rm/(r*dr))**2
+        self.d2_lp1 = sin(thp)/(sin(th)*(r*dth)**2)
+        self.d2_lm1 = sin(thm)/(sin(th)*(r*dth)**2)
+        self.d2 = -((rp**2+rm**2)/(r*dr)**2 + (sin(thp) + sin(thm))/(sin(th)*(r*dth)**2) + (m/(r*sin(th)))**2)
+
+        #%% d2r
+        self.d2r_thlp1  = - self.ddth_lp1/r
+        self.d2r_thlm1  = - self.ddth_lm1/r
+        self.d2r_th = - self.ddth/r
+        self.d2r_ph = - self.ddph/r
+
+        #%% d2th
+        self.d2th_rlp1 = self.ddth_lp1/r
+        self.d2th_rlm1 = self.ddth_lm1/r
+        self.d2th_r = self.ddth/r
+        self.d2th_ph= -self.ddph/(r*tan(th))
+
+        #%% d2ph
+        self.d2ph_r = self.ddph/r
+        self.d2ph_th = self.ddph/(r*tan(th))
+
 class GovEquation():
     def __init__(self, model, variable):
         self.rows = []
