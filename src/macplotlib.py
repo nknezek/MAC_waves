@@ -128,7 +128,6 @@ def plot_robinson(model, vec, m, v_scale=1.0, oscillate=False, dir_name='./', ti
    for x in range(Nph):
        for y in range(1,model.Nl-1):
            div[y,x] = u[y,x]*m*1j + (v[y+1,x]-v[y-1,x])/(2.*model.dth)
-#    import ipdb; ipdb.set_trace()
    ### Plot Robinson Projection
    plt.figure(figsize=(10,10))
    ## Set up map
@@ -328,8 +327,7 @@ def plot_B(model, dir_name='./', title='B field structure'):
     plt.close('all')
     fig = plt.figure(figsize=(10,10))
     plt.subplot(3,1,1)
-    import ipdb
-    ipdb.set_trace()
+
     plt.plot(model.th[0,:]*180./np.pi,model.Br[model.Nk/2,:]*model.B_star*1e3)
     xmin, xmax = plt.xlim()
     if xmin > 0.0:
