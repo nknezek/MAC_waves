@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 import numpy as np
 """ Configuration File for SLEPc Run solving MAC model """
 
@@ -30,13 +30,7 @@ tol = 1e-8
 
 dCyr_list = [68.44627]
 data_dir = [
-'../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB31_Bn0.3e-3/'
-#'../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB50_Bn0.5e-3/'
-#'../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB50_Bn0.1e-3/'
-#'../data/k40_l200_m0_nu8e-01_139km_linearG200_constantBrB62_2/'
-#'../data/k20_l200_m0_nu8e-01_139km_constantG70_constantBrB62_2/'
-#'../data/k20_l200_m0_nu8e-01_139km_constantG90_constantBrB62_2/'
-
+'../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB31_8d7f6ab/'
 ]
 
 

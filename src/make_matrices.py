@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 import sys
 import macplotlib as mplt
 import itertools as it
@@ -9,7 +9,7 @@ import importlib
 sys.path.append('../config')
 config_file = sys.argv[1].rstrip('\.py')
 cfg = importlib.import_module(config_file)
-print "used config file {0}".format(config_file)
+print("used config file {0}".format(config_file))
 
 # Store constant parameters
 mlog = cfg.mlog
@@ -80,16 +80,16 @@ for c in combinations:
 
     mlog.ensure_dir(dir_name)
 
-    print 'done setting up model'
+    print('done setting up model')
 
     # %% Save Model info
     #==============================================================================
     mplt.plot_buoy_struct(model, dir_name=dir_name)
-    print 'plotted buoyancy structure'
+    print('plotted buoyancy structure')
     mplt.plot_B(model, dir_name=dir_name)
-    print 'plotted background magnetic field structure'
+    print('plotted background magnetic field structure')
     mplt.plot_Uphi(model, dir_name=dir_name)
-    print 'plotted background Uphi structure'
+    print('plotted background Uphi structure')
 
     logger = mlog.setup_custom_logger(dir_name=dir_name, filename='model.log')
     logger.info('\n' +
@@ -117,34 +117,34 @@ for c in combinations:
     'model variables = ' + str(model.model_variables) + '\n' +
     'boundary variables = ' + str(model.boundary_variables)
     )
-    print 'model will be saved in ' + str(dir_name)
+    print('model will be saved in ' + str(dir_name))
 
     #%% Make matricies used for later analysis
     #==============================================================================
     model.make_Bobs()
-    print 'created Bobs matrix'
+    print('created Bobs matrix')
 #    model.make_D3sqMat()
-#    print 'created D3sq matrix'
+#    print('created D3sq matrix')
 #    model.make_dthMat()
-#    print 'created dth matrix'
+#    print('created dth matrix')
 
 
     #%% Save Model Information
     #==============================================================================
     model.save_model(dir_name + filemodel)
-    print 'saved model to ' + str(dir_name)
+    print('saved model to ' + str(dir_name))
 
     #%% Create Matrices
     #===============================================================================
     model.make_B()
-    print 'created B matrix'
+    print('created B matrix')
     epB = np.min(np.abs(model.B.data[np.nonzero(model.B.data)]))*ep
     model.save_mat_PETSc(dir_name+fileB+'.dat', model.B.toPETSc(epsilon=epB))
-    print 'saved PETSc B matrix ' + str(dir_name)
+    print('saved PETSc B matrix ' + str(dir_name))
     model.make_A_noCCBC()
-    print 'created A_noCCBC matrix'
+    print('created A_noCCBC matrix')
     model.set_CC_skin_depth(dCyr)
     model.add_CCBC()
     epA = np.min(np.abs(model.A.data[np.nonzero(model.A.data)]))*ep
     model.save_mat_PETSc(dir_name+fileA+str(dCyr)+'.dat', model.A.toPETSc(epsilon=epA))
-    print 'saved PETSc A matrix for dCyr = {0} to '.format(dCyr) + str(dir_name)
+    print('saved PETSc A matrix for dCyr = {0} to '.format(dCyr) + str(dir_name))

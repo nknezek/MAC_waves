@@ -1,10 +1,10 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import macloglib as mlog
 import macplotlib as mplt
 import mac_analysis as mana
 
-import cPickle as pkl
+import pickle as pkl
 import numpy as np
 import itertools as it
 from datetime import datetime
@@ -22,7 +22,7 @@ opts = PETSc.Options()
 sys.path.append('../config')
 config_file = sys.argv[1].rstrip('\.py')
 cfg = importlib.import_module(config_file)
-print "used config file {0}".format(config_file)
+print("used config file {0}".format(config_file))
 
 # function to find nearest skin-depth value for a wave period
 def find_closest_CC(Target, dCyr_list):
@@ -112,7 +112,10 @@ for cnum, c in enumerate(combinations):
             A = PETSc.Mat().load(viewer)
             viewer = PETSc.Viewer().createBinary(data_dir+fileB+'.dat', 'r')
             B = PETSc.Mat().load(viewer)
-            model = pkl.load(open(data_dir+filemodel,'rb'))
+            try:
+                model = pkl.load(open(data_dir+filemodel,'rb'))
+            except:
+                model = pkl.load(open(data_dir+filemodel,'rb'),encoding='latin1')
             logger.info('A'+str(dCyr_use)+' matrix used')
             logger.info('matrices and model loaded into memory from ' + data_dir)
         except:

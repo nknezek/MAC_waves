@@ -4,13 +4,13 @@ import numpy as np
 #import macmodel_noCC_sympBC as mac
 import macmodel_rlorentz as mac
 import macloglib as mlog
-import cPickle as pkl
+import pickle as pkl
 
 # mode to simulate (longitudinal)
 m = [0]
 
 # Size of grid
-Nk = 2 # Radial cells
+Nk = 20 # Radial cells
 Nl = 200 # Latitudinal cells
 
 # Define Physical Constants
@@ -58,5 +58,5 @@ buoy_ratio =  [1.0]
 # model parameters
 model_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p', 'r_disp')
 boundary_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p')
-dir_suf = '_Bn0.3e-3'
+dir_suf = '_python3'
 ep = 1e-3

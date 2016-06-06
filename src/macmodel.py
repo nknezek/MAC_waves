@@ -8,10 +8,7 @@ slepc4py.init(sys.argv)
 from petsc4py import PETSc
 from slepc4py import SLEPc
 opts = PETSc.Options()
-try:
-    import cPickle as pkl
-except:
-    import pickle as pkl
+import pickle as pkl
 
 class Model():
     def __init__(self, model_variables, boundary_variables,
