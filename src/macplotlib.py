@@ -328,7 +328,7 @@ def plot_B(model, dir_name='./', title='B field structure'):
     plt.close('all')
     fig = plt.figure(figsize=(10,10))
     plt.subplot(3,1,1)
-    plt.plot(model.th*180./np.pi,model.Br[model.Nk/2,1:-1]*model.B_star*1e3)
+    plt.plot(model.th*180./np.pi,model.Br[model.Nk/2,:]*model.B_star*1e3)
     xmin, xmax = plt.xlim()
     if xmin > 0.0:
         plt.xlim(xmin=0.0)
@@ -337,13 +337,13 @@ def plot_B(model, dir_name='./', title='B field structure'):
     plt.xlabel('colatitude in degrees')
 
     plt.subplot(3,1,2)
-    plt.plot(model.th*180./np.pi,model.Bth[model.Nk/2,1:-1]*model.B_star*1e3)
+    plt.plot(model.th*180./np.pi,model.Bth[model.Nk/2,:]*model.B_star*1e3)
     plt.title('B_theta background field')
     plt.ylabel('B_theta in (10^-3 T)')
     plt.xlabel('colatitude in degrees')
 
     plt.subplot(3,1,2)
-    plt.plot(model.th*180./np.pi,model.Bph[model.Nk/2,1:-1]*model.B_star*1e3)
+    plt.plot(model.th*180./np.pi,model.Bph[model.Nk/2,:]*model.B_star*1e3)
     plt.title('B_phi background field')
     plt.ylabel('B_phi in (10^-3 T)')
     plt.xlabel('colatitude in degrees')
