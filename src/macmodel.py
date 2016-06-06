@@ -62,7 +62,7 @@ class Model():
         self.B_star = (self.eta*self.mu_0*self.rho/self.t_star)**0.5
         self.u_star = self.r_star/self.t_star
         self.E = self.nu*self.t_star/self.r_star**2
-        self.Prm = self.nu/self.eta
+        self.Pm = self.nu/self.eta
         return None
 
     def set_Br(self, BrT):
