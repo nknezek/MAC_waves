@@ -19,7 +19,7 @@ def plot_1D(model,vec,val,m,l):
     E = model.E
     Nk = model.Nk
     Nl = model.Nl
-    th = model.th
+    th = model.th[0,:]
     ## Plot Figures
     fig, axes = plt.subplots(3,1,figsize=(15,8), sharex=True, sharey=True)
     titles = ['Absolute Value','Real','Imaginary']
@@ -49,7 +49,7 @@ def plot_mollyweide(model,vec,val,m,l,v_scale=1.0):
    E = model.E
    Nk = model.Nk
    Nl = model.Nl
-   th = model.th
+   th = model.th[0,:]
    ## Calculate vector field and contour field for plotting with basemap
    ## Create full vector grid in theta and phi
    u_1D = model.get_variable(vec,'uph')[0][0]
@@ -76,7 +76,7 @@ def plot_mollyweide(model,vec,val,m,l,v_scale=1.0):
 
 def plot_B_obs(model, vec, m, oscillate=False, dir_name='./', title='B-Perturbation at Core Surface'):
    Nl = model.Nl
-   th = model.th
+   th = model.th[0,:]
 
    ## Plot Robinson vector field
    #### Display waves on a Spherical Map Projection
@@ -106,7 +106,7 @@ def plot_robinson(model, vec, m, v_scale=1.0, oscillate=False, dir_name='./', ti
    E = model.E
    Nk = model.Nk
    Nl = model.Nl
-   th = model.th
+   th = model.th[0,:]
 
    ## Plot Robinson vector field
    #### Display waves on a Spherical Map Projection
@@ -192,7 +192,7 @@ def plot_pcolormesh_rth(model,val,vec,dir_name='./',title='pcolormesh MAC Wave P
     B_star = model.B_star
     u_star = model.u_star
     rpl = model.r[1:-1]*r_star/1e3
-    thpl = model.th*180./np.pi
+    thpl = model.th[0,:]*180./np.pi
     fig = plt.figure(figsize=(14,14))
     fig.suptitle(title, fontsize=14)
     gs = gridspec.GridSpec(8, 2, width_ratios=[100, 1])
@@ -248,7 +248,7 @@ def plot_vel_AGU(model,vec,dir_name='./',title='Velocity for AGU', physical_unit
     B_star = model.B_star
     u_star = model.u_star
     rpl = model.r[1:-1]*r_star/1e3
-    thpl = model.th*180./np.pi
+    thpl = model.th[0,:]*180./np.pi
     ur = model.get_variable(vec, 'ur', returnBC=False)*u_star
     ur[:,::2] = ur[:,::2]*-1
     urmax = np.amax(abs(ur))
@@ -328,7 +328,9 @@ def plot_B(model, dir_name='./', title='B field structure'):
     plt.close('all')
     fig = plt.figure(figsize=(10,10))
     plt.subplot(3,1,1)
-    plt.plot(model.th*180./np.pi,model.Br[model.Nk/2,:]*model.B_star*1e3)
+    import ipdb
+    ipdb.set_trace()
+    plt.plot(model.th[0,:]*180./np.pi,model.Br[model.Nk/2,:]*model.B_star*1e3)
     xmin, xmax = plt.xlim()
     if xmin > 0.0:
         plt.xlim(xmin=0.0)
@@ -337,13 +339,13 @@ def plot_B(model, dir_name='./', title='B field structure'):
     plt.xlabel('colatitude in degrees')
 
     plt.subplot(3,1,2)
-    plt.plot(model.th*180./np.pi,model.Bth[model.Nk/2,:]*model.B_star*1e3)
+    plt.plot(model.th[0,:]*180./np.pi,model.Bth[model.Nk/2,:]*model.B_star*1e3)
     plt.title('B_theta background field')
     plt.ylabel('B_theta in (10^-3 T)')
     plt.xlabel('colatitude in degrees')
 
     plt.subplot(3,1,2)
-    plt.plot(model.th*180./np.pi,model.Bph[model.Nk/2,:]*model.B_star*1e3)
+    plt.plot(model.th[0,:]*180./np.pi,model.Bph[model.Nk/2,:]*model.B_star*1e3)
     plt.title('B_phi background field')
     plt.ylabel('B_phi in (10^-3 T)')
     plt.xlabel('colatitude in degrees')
@@ -353,7 +355,7 @@ def plot_B(model, dir_name='./', title='B field structure'):
 def plot_Uphi(model, dir_name='./', title='Uphi structure'):
     plt.close('all')
     fig = plt.figure(figsize=(10,5))
-    plt.pcolor(model.th*180./np.pi,(model.r[1:-1]-1)*model.r_star/1000,model.Uphi[1:-1,1:-1]*model.u_star)
+    plt.pcolor(model.th[0,:]*180./np.pi,(model.r[1:-1]-1)*model.r_star/1000,model.Uphi[1:-1,1:-1]*model.u_star)
     plt.colorbar()
     plt.title('Uphi background velocity field')
     plt.ylabel('depth below CMB (km)')
