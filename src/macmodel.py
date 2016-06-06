@@ -475,9 +475,9 @@ class Model():
         return self.dphMat
 
     def make_Bobs(self):
-        BrobsT = 2*np.ones((self.Nk+2, self.Nl+2))*cos(self.th)
+        BrobsT = 2*np.ones((self.Nk+2, self.Nl))*cos(self.th)
         self.Brobs = BrobsT/self.B_star
-        gradBrobsT = -2*np.ones((self.Nk+2, self.Nl+2))*sin(self.th)/self.R
+        gradBrobsT = -2*np.ones((self.Nk+2, self.Nl))*sin(self.th)/self.R
         self.gradBrobs = gradBrobsT/self.B_star*self.r_star
         self.add_gov_equation('Bobs', 'ur')
         self.Bobs.add_term('uth', 'self.model.gradBrobs[k,l]')

@@ -342,7 +342,7 @@ def plot_B(model, dir_name='./', title='B field structure'):
     plt.ylabel('B_theta in (10^-3 T)')
     plt.xlabel('colatitude in degrees')
 
-    plt.subplot(3,1,2)
+    plt.subplot(3,1,3)
     plt.plot(model.th[0,:]*180./np.pi,model.Bph[model.Nk/2,:]*model.B_star*1e3)
     plt.title('B_phi background field')
     plt.ylabel('B_phi in (10^-3 T)')
