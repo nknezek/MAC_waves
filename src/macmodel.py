@@ -563,14 +563,13 @@ class GovEquation():
         self.variable = variable
         self.model = model
 
-    def add_term(self, var, value, kdiff=0, ldiff=0, mdiff=0, k_vals=None,
-                 l_vals=None):
-        ''' Adds a term to the governing equation.
+    def add_term(self, var, values, kdiff=0, ldiff=0, mdiff=0, k_vals=None, l_vals=None):
+        """ Adds a term to the governing equation.
         By default, iterates over 1 < k < Nk and 1 < l < Nl
         with kdiff = ldiff = mdiff = 0
         inputs:
             str var:     model variable name to input for
-            str value:   string expression to evaluate for value to input
+            nparray values:   nparray of values
             int kdiff:   offset to use for k
             int ldiff:   offset to use for l
             int mdiff:   offset to use for m
@@ -578,30 +577,15 @@ class GovEquation():
             list l_vals: list of int l values to iterate over
         output:
             none
-        '''
-        dr = self.model.dr
-        r = self.model.r
-        rp = self.model.rp
-        rm = self.model.rm
-        dth = self.model.dth
-        th = self.model.th
-        thm = self.model.thm
-        thp = self.model.thp
+        """
+
         Nk = self.model.Nk
         Nl = self.model.Nl
-        E = self.model.E
-        Prm = self.model.Prm
-        G = self.model.G
-        Br = self.model.Br
-        Bth = self.model.Bth
-        Bph = self.model.Bph
-        U0 = self.model.U0
-        m = self.model.m
 
         if l_vals is None:
-            l_vals = range(1, Nl+1)
+            l_vals = range(max(0,-ldiff),Nl+min(0,-ldiff))
         if k_vals is None:
-            k_vals = range(1, Nk+1)
+            k_vals = range(1,Nk+1)
 
         # Check Inputs:
         if var not in self.model.model_variables:
@@ -609,46 +593,143 @@ class GovEquation():
 
         for l in l_vals:
             for k in k_vals:
-                if l > Nl or l < 1:
-                    raise RuntimeError('l out of bounds')
-                if k > Nk+1 or k < 0:
-                    raise RuntimeError('k out of bounds')
-                if type(value) in (int, complex, float):
-                    value_computed = value
-                else:
-                    try:
-                        value_computed = eval(value, globals(), locals())
-                    except:
-                        import ipdb; ipdb.set_trace()
-                        raise RuntimeError('Problem evaluating term')
-
-                if not ((l+ldiff <= 0) or (l+ldiff >= Nl+1) or value_computed == 0.0):
+                if values[k,l] is not 0.0:
                     self.rows.append(self.model.get_index(k, l, self.variable))
                     self.cols.append(self.model.get_index(k+kdiff, l+ldiff, var))
-                    self.vals.append(value_computed)
+                    self.vals.append(values[k,l])
 
-    def add_bc(self, var, value, k, kdiff=0, k_vals=None, l_vals=None):
-        dr = self.model.dr
-        r = self.model.r
-        rp = self.model.rp
-        rm = self.model.rm
-        dth = self.model.dth
-        th = self.model.th
-        thm = self.model.thm
-        thp = self.model.thp
-        Nk = self.model.Nk
-        Nl = self.model.Nl
-        E = self.model.E
-        Prm = self.model.Prm
-        G = self.model.G
-        Br = self.model.Br
-        Bth = self.model.Bth
-        Bph = self.model.Bph
-        U0 = self.model.U0
-        m = self.model.m
+    def add_value(self, value, row, col):
+        """
+        Adds a term to a specific index.
+        value: term to add
+        row: dictionary containing 'k','l',and 'var'
+        col: dictionary containing 'k','l',and 'var'
+        """
+        self.rows.append(self.model.get_index(row['k'], row['l'], row['var']))
+        self.cols.append(self.model.get_index(col['k'], col['l'], col['var']))
+        self.vals.append(eval(value, globals(), locals()))
+
+    def add_dr(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :return:
+        """
+        self.add_term(var, C*self.model.ddr_kp1, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_km1, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr, k_vals=k_vals, l_vals=l_vals)
+
+    def add_dth(self, var, C=1, k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.ddth_lp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddth_lm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddth, k_vals=k_vals, l_vals=l_vals)
+
+    def add_dph(self, var, C=1, k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.ddph, k_vals=k_vals, l_vals=l_vals)
+
+    def add_drP(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.drP_kp1, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.drP_km1, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.drP_lp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.drP_lm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.drP, k_vals=k_vals, l_vals=l_vals)
+
+    def add_dthP(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.dthP_lp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.dthP_lm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.dthP, k_vals=k_vals, l_vals=l_vals)
+
+    def add_dphP(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.dphP, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.d2_kp1, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_km1, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2r_th(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :param var:
+        :param C:
+        :param k_vals:
+        :param l_vals:
+        :return:
+        """
+        self.add_term(var, C*self.model.d2r_thlp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2r_thlm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2r_th, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2r_ph(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :param var:
+        :param C:
+        :param k_vals:
+        :param l_vals:
+        :return:
+        """
+        self.add_term(var, C*self.model.d2r_ph, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2th_r(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :param var:
+        :param C:
+        :param k_vals:
+        :param l_vals:
+        :return:
+        """
+        self.add_term(var, C*self.model.d2th_rlp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2th_rlm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2th_r, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2th_ph(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :param var:
+        :param C:
+        :param k_vals:
+        :param l_vals:
+        :return:
+        """
+        self.add_term(var, C*self.model.d2th_ph, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2ph_r(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :param var:
+        :param C:
+        :param k_vals:
+        :param l_vals:
+        :return:
+        """
+        self.add_term(var, C*self.model.d2ph_r, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2ph_th(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :param var:
+        :param C:
+        :param k_vals:
+        :param l_vals:
+        :return:
+        """
+        self.add_term(var, C*self.model.d2ph_th, k_vals=k_vals, l_vals=l_vals)
+
+    def add_bc(self, var, C=1., k=0, kdiff=0, l_vals=None):
+        """
+
+        :param var:
+        :param C:
+        :param k_vals:
+        :param l_vals:
+        :return:
+        """
 
         if l_vals is None:
-            l_vals = range(1, Nl+1)
+            l_vals = range(self.model.Nl)
 
         if var not in self.model.boundary_variables:
             raise RuntimeError('variable is not in boundary_variables')
@@ -656,90 +737,7 @@ class GovEquation():
         for l in l_vals:
             self.rows.append(self.model.get_index(k, l, var))
             self.cols.append(self.model.get_index(k+kdiff, l, var))
-            self.vals.append(eval(value, globals(), locals()))
-
-    def add_value(self, value, row, col):
-        '''
-        Adds a term to a specific index.
-        value: term to add
-        row: dictionary containing 'k','l',and 'var'
-        col: dictionary containing 'k','l',and 'var'
-        '''
-        self.rows.append(self.model.get_index(row['k'], row['l'], row['var']))
-        self.cols.append(self.model.get_index(col['k'], col['l'], col['var']))
-        self.vals.append(eval(value, globals(), locals()))
-
-    def add_Dr(self, var, const=1., k_vals=None, l_vals=None):
-        self.add_term(var, str(const)+'*+(rp[k]/r[k])**2.0 / (2.0*dr)',
-                      kdiff=+1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*-(rm[k]/r[k])**2.0 / (2.0*dr)',
-                      kdiff=-1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*-(sin(thp[l])/sin(th[l]))/(4.0*r[k])',
-                      ldiff=+1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*-(sin(thm[l])/sin(th[l]))/(4.0*r[k])',
-                      ldiff=-1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const) +
-                      '*-(sin(thp[l])+sin(thm[l]))/(4.0*r[k]*sin(th[l]))',
-                      k_vals=k_vals, l_vals=l_vals)
-
-    def add_Dth(self, var, const=1, k_vals=None, l_vals=None):
-        self.add_term(var, str(const) +
-                      '*+(sin(thp[l])/sin(th[l]))/(2.0*r[k]*dth)', ldiff=+1,
-                      k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const) +
-                      '*-(sin(thm[l])/sin(th[l]))/(2.0*r[k]*dth)', ldiff=-1,
-                      k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const) +
-                      '*((sin(thp[l])-sin(thm[l]))/(2.0*dth) -\
-                      cos(th[l]))/(r[k]*sin(th[l]))', k_vals=k_vals,
-                      l_vals=l_vals)
-
-    def add_Dph(self, var, const=1, k_vals=None, l_vals=None):
-        self.add_term(var, str(const)+'*1j*m/(r[k]*sin(th[l]))')
-
-    def add_dr(self, var, const=1., k_vals=None, l_vals=None):
-        self.add_term(var, str(const)+'*rp[k]**2/(2*r[k]**2*dr)', kdiff=+1,
-                      k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*-(rm[k]**2)/(2*r[k]**2*dr)',
-                      kdiff=-1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*1/r[k]', k_vals=k_vals,
-                      l_vals=l_vals)
-
-    def add_dth(self, var, const=1., k_vals=None, l_vals=None):
-        self.add_term(var, str(const)+'*sin(thp[l])/(2*sin(th[l])*r[k]*dth)',
-                      ldiff=+1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*-sin(thm[l])/(2*sin(th[l])*r[k]*dth)',
-                      ldiff=-1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const) +
-                      '*(sin(thp[l])-sin(thm[l]))/(2*sin(th[l])*r[k]*dth)',
-                      k_vals=k_vals, l_vals=l_vals)
-
-    def add_dph(self, var, const=1., k_vals=None, l_vals=None):
-        self.add_term(var, str(const)+'*1j*m/(r[k]*sin(th[l]))',
-                      k_vals=k_vals, l_vals=l_vals)
-
-    def add_dthsq(self, var, const=1., k_vals=None, l_vals=None):
-        self.add_term(var, str(const)+'*-(sin(thp[l])+sin(thm[l]))/(sin(th[l])*r[k]**2*dth**2)', k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*sin(thp[l])/(sin(th[l])*r[k]**2*dth**2)', ldiff=+1, k_vals=k_vals,
-                      l_vals=l_vals)
-        self.add_term(var, str(const)+'*sin(thm[l])/(sin(th[l])*r[k]**2*dth**2)', ldiff=-1, k_vals=k_vals,
-                      l_vals=l_vals)
-
-    def add_D3sq(self, var, const=1., k_vals=None, l_vals=None):
-        self.add_term(var, str(const)+'*(rp[k]/(r[k]*dr))**2', kdiff=+1,
-                      k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*(rm[k]/(r[k]*dr))**2', kdiff=-1,
-                      k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*sin(thp[l])/(sin(th[l])*r[k]**2*dth**2)',
-                      ldiff=+1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const)+'*sin(thm[l])/(sin(th[l])*r[k]**2*dth**2)',
-                      ldiff=-1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, str(const) +
-                      '*((-rp[k]**2-rm[k]**2)/(r[k]**2*dr**2) -\
-                      (sin(thp[l])+sin(thm[l]))/(sin(th[l])*r[k]**2*dth**2) -\
-                      m**2/(r[k]**2*sin(th[l])**2))', k_vals=k_vals,
-                      l_vals=l_vals)
-
+            self.vals.append(C)
     def get_coo_matrix(self):
         return coo_matrix((self.vals, (self.rows, self.cols)),
                           shape=(self.model.SizeM, self.model.SizeM))
@@ -750,7 +748,6 @@ class GovEquation():
 
     def todense(self):
         return self.get_coo_matrix().todense()
-
 
 class csr_matrix(scipy.sparse.csr.csr_matrix):
     ''' Subclass to allow conversion to PETSc matrix format'''
@@ -787,7 +784,6 @@ class csr_matrix(scipy.sparse.csr.csr_matrix):
                                                        major_indices)
         row, col = self._swap((major_indices, minor_indices))
         return coo_matrix((data, (row, col)), self.shape)
-
 
 class coo_matrix(scipy.sparse.coo.coo_matrix):
     ''' Subclass to allow conversion to PETSc matrix format'''
