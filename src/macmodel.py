@@ -27,28 +27,29 @@ class Model():
         self.set_up_grid(self.R, self.h)
         
     def set_up_grid(self, R, h):
-        '''
+        """
         Creates the r and theta coordinate vectors
         inputs:
             R: radius of outer core in m
             h: layer thickness in m
         outputs: None
-        '''
+        """
         self.R = R
         self.h = h
         self.Size_var = self.Nk*self.Nl
         self.SizeMnoBC = len(self.model_variables)*self.Size_var
-        self.SizeM = self.SizeMnoBC + 2*len(self.boundary_variables)*self.Nl
-        self.rmin = (self.R-self.h)/self.r_star
-        self.rmax = self.R/self.r_star
+        self.SizeM = self.SizeMnoBC +len(self.boundary_variables)*2*self.Nl
+        self.rmin = (R-h)/self.r_star
+        self.rmax = R/self.r_star
         self.dr = (self.rmax-self.rmin)/(self.Nk)
-        self.r = np.linspace(self.rmin-self.dr/2., self.rmax+self.dr/2.,num=self.Nk+2.) # r value at center of each cell
-        self.rm = np.linspace(self.rmin-self.dr, self.rmax, num=self.Nk+2.) # r value at plus border (top) of cell
-        self.rp = np.linspace(self.rmin, self.rmax+self.dr, num=self.Nk+2.) # r value at minus border (bottom) of cell
+        ones = np.ones((self.Nk+2,self.Nl))
+        self.r = (ones.T*np.linspace(self.rmin-self.dr/2., self.rmax+self.dr/2.,num=self.Nk+2)).T # r value at center of each cell
+        self.rp = (ones.T*np.linspace(self.rmin, self.rmax+self.dr, num=self.Nk+2)).T # r value at plus border (top) of cell
+        self.rm = (ones.T*np.linspace(self.rmin-self.dr, self.rmax, num=self.Nk+2)).T # r value at minus border (bottom) of cell
         self.dth = np.pi/(self.Nl)
-        self.th = np.linspace(-self.dth/2., np.pi+self.dth/2., num=self.Nl+2.) # theta value at center of cell
-        self.thm = np.linspace(-self.dth, np.pi, num=self.Nl+2.) # theta value at plus border (top) of cell
-        self.thp = np.linspace(0,np.pi+self.dth, num=self.Nl+2.)
+        self.th = ones*np.linspace(self.dth/2., np.pi-self.dth/2., num=self.Nl) # theta value at center of cell
+        self.thp = ones*np.linspace(self.dth, np.pi, num=self.Nl) # theta value at plus border (top) of cell
+        self.thm = ones*np.linspace(0,np.pi-self.dth, num=self.Nl)
         return None
 
     def calculate_nondimensional_parameters(self):
