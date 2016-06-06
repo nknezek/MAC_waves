@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.sparse
-from numpy import sin
-from numpy import cos
+from numpy import sin, cos, tan
 import sys
 import slepc4py
 slepc4py.init(sys.argv)

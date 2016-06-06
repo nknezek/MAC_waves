@@ -78,7 +78,7 @@ for c in combinations:
         model.set_CC_skin_depth(dCyr)
     model.set_Uphi(Uphi)
     model.make_operators()
-    
+
     mlog.ensure_dir(dir_name)
 
     print('done setting up model')
