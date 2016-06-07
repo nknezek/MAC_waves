@@ -297,13 +297,13 @@ class Model():
                                model')
         else:
             var_start = self.get_index(1, 1, var)
-            var_end = self.get_index(Nk, Nl, var)+1
+            var_end = self.get_index(Nk, Nl-1, var)+1
             variable = np.array(np.reshape(vector[var_start:var_end], (Nk, Nl), 'F'))
             if var in self.boundary_variables:
-                bound_bot_start = self.get_index(0, 1, var)
-                bound_bot_end = self.get_index(0, Nl, var)+1
-                bound_top_start = self.get_index(Nk+1, 1, var)
-                bound_top_end = self.get_index(Nk+1, Nl, var)+1
+                bound_bot_start = self.get_index(0, 0, var)
+                bound_bot_end = self.get_index(0, Nl-1, var)+1
+                bound_top_start = self.get_index(Nk+1, 0, var)
+                bound_top_end = self.get_index(Nk+1, Nl-1, var)+1
                 bottom_boundary = np.array(np.reshape(vector[bound_bot_start:
                                              bound_bot_end], (1, Nl)))
                 top_boundary = np.array(np.reshape(vector[bound_top_start:
