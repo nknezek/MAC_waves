@@ -1,4 +1,5 @@
 #! /usr/bin/env python3
+
 import sys
 import macplotlib as mplt
 import itertools as it
@@ -145,6 +146,7 @@ for c in combinations:
     model.save_mat_PETSc(dir_name+fileB+'.dat', model.B.toPETSc(epsilon=epB))
     print('saved PETSc B matrix ' + str(dir_name))
     model.make_A()
+    print('created A matrix')
     epA = np.min(np.abs(model.A.data[np.nonzero(model.A.data)]))*ep
     model.save_mat_PETSc(dir_name+fileA+str(dCyr)+'.dat', model.A.toPETSc(epsilon=epA))
     print('saved PETSc A matrix for dCyr = {0} to '.format(dCyr) + str(dir_name))

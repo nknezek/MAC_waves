@@ -102,7 +102,7 @@ class Model():
         ''' Sets the background magnetic field to a dipole field with
         Bd = dipole constant in Tesla '''
         self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl))*cos(self.th)*Bd + const
+        self.BrT = 2*cos(self.th)*Bd + const
         self.Br = self.BrT/self.B_star
         self.set_Bth(0.0)
         self.set_Bph(0.0)
@@ -113,9 +113,9 @@ class Model():
         ''' Sets the background magnetic field to a dipole field with
         Bd = dipole constant in Tesla '''
         self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl))*cos(self.th)*Bd + const
+        self.BrT = 2*cos(self.th)*Bd + const
         self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl))*sin(self.th)*Bd + const
+        self.BthT = sin(self.th)*Bd + const
         self.Bth = self.BthT/self.B_star
         self.set_Bph(0.0)
         return None
@@ -124,9 +124,9 @@ class Model():
         ''' Sets the background magnetic Br and Bth field to the absolute value of a
         dipole field with Bd = dipole constant in Tesla '''
         self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl))*abs(cos(self.th))*Bd + const
+        self.BrT = 2*abs(cos(self.th))*Bd + const
         self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl))*abs(sin(self.th))*Bd + const
+        self.BthT = abs(sin(self.th))*Bd + const
         self.Bth = self.BthT/self.B_star
         self.set_Bph(0.0)
         return None
@@ -135,9 +135,9 @@ class Model():
         ''' Sets the background magnetic Br and Bth field to the absolute value of a
         dipole field with Bd = dipole constant in Tesla '''
         self.Bd = Bd
-        self.BrT = 2*np.ones((self.Nk+2, self.Nl))*abs(cos(self.th))*Bd + const
+        self.BrT = 2*abs(cos(self.th))*Bd + const
         self.Br = self.BrT/self.B_star
-        self.BthT = np.ones((self.Nk+2, self.Nl))*sin(self.th)*Bd + const
+        self.BthT = sin(self.th)*Bd + const
         self.Bth = self.BthT/self.B_star
         self.set_Bph(0.0)
         return None
@@ -159,14 +159,14 @@ class Model():
             self.Br = self.BrT/self.B_star
         else:
             self.Bd = Bd
-            self.BrT = 2*np.ones((self.Nk+2, self.Nl))*abs(cos(self.th))*Bd + const
+            self.BrT = 2*abs(cos(self.th))*Bd + const
             self.Br = self.BrT/self.B_star
         self.set_Bth(0.0)
         self.set_Bph(0.0)
         return None
 
     def set_Br_sinfunc(self, Bmin, Bmax, sin_exp=2.5):
-        self.BrT = np.ones((self.Nk+2, self.Nl))*((1-sin(self.th)**sin_exp)*(Bmax-Bmin)+Bmin)
+        self.BrT = ((1-sin(self.th)**sin_exp)*(Bmax-Bmin)+Bmin)
         self.Br = self.BrT/self.B_star
         self.set_Bth(0.0)
         self.set_Bph(0.0)
