@@ -49,10 +49,10 @@ def get_max_dth_norm(model, vec, var=None):
 
 def get_equator_power_excess(model, vec, var='ur', split=0.5):
     var_out = model.get_variable(vec, var, returnBC=False)
-    var_noneq_power = abs(np.concatenate((var_out[:, :model.Nl*(0.5-split/2.)],
-                                         var_out[:, model.Nl*(0.5+split/2.):]),
+    var_noneq_power = abs(np.concatenate((var_out[:, :(model.Nl-1)*(0.5-split/2.)],
+                                         var_out[:, (model.Nl-1)*(0.5+split/2.):]),
                                          axis=1)).sum()
-    var_eq_power = abs(var_out[:, model.Nl*(0.5-split/2.):model.Nl*(0.5+split/2.)]).sum()
+    var_eq_power = abs(var_out[:, (model.Nl-1)*(0.5-split/2.):(model.Nl-1)*(0.5+split/2.)]).sum()
     return var_eq_power-var_noneq_power
 
 

@@ -30,7 +30,8 @@ tol = 1e-8
 
 dCyr_list = [68.44627]
 data_dir = [
-    '../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB31_python3/',
+    '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix/',
+    # '../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB31_python3/',
 # '../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB31_8d7f6ab/'
 ]
 
