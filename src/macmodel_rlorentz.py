@@ -167,36 +167,36 @@ class Model(macmodel.Model):
         # Boundary Conditions
         self.add_gov_equation('BC', 'p')
 
-        self.BC.add_bc('ur', C = 1., k=0)
-        self.BC.add_bc('ur', C = 1., k=0, kdiff=1)
-        self.BC.add_bc('ur', C = 1., k=Nk+1)
-        self.BC.add_bc('ur', C = 1., k=Nk+1, kdiff=-1)
+        self.BC.add_bc('ur', C = self.r[0,0]**2, k=0)
+        self.BC.add_bc('ur', C = self.r[0,0]**2, k=0, kdiff=1)
+        self.BC.add_bc('ur', C = self.r[-1,0]**2, k=Nk+1)
+        self.BC.add_bc('ur', C = self.r[-1,0]**2, k=Nk+1, kdiff=-1)
 
-        self.BC.add_bc('uth', C = 1., k=0)
-        self.BC.add_bc('uth', C = -1., k=0, kdiff=1)
-        self.BC.add_bc('uth', C = 1., k=Nk+1)
-        self.BC.add_bc('uth', C = -1., k=Nk+1, kdiff=-1)
+        self.BC.add_bc('uth', C = self.r[0,0]**2, k=0)
+        self.BC.add_bc('uth', C = -self.r[0,0]**2, k=0, kdiff=1)
+        self.BC.add_bc('uth', C = self.r[-1,0]**2, k=Nk+1)
+        self.BC.add_bc('uth', C = -self.r[-1,0]**2, k=Nk+1, kdiff=-1)
 
-        self.BC.add_bc('uph', C = 1., k=0)
-        self.BC.add_bc('uph', C = -1., k=0, kdiff=1)
-        self.BC.add_bc('uph', C = 1., k=Nk+1)
-        self.BC.add_bc('uph', C = -1., k=Nk+1, kdiff=-1)
+        self.BC.add_bc('uph', C = self.r[0,0]**2, k=0)
+        self.BC.add_bc('uph', C = -self.r[0,0]**2, k=0, kdiff=1)
+        self.BC.add_bc('uph', C = self.r[-1,0]**2, k=Nk+1)
+        self.BC.add_bc('uph', C = -self.r[-1,0]**2, k=Nk+1, kdiff=-1)
 
         self.BC.add_bc('p', C = 1, k=0)
         self.BC.add_bc('p', C = -1, k=0, kdiff=1)
         self.BC.add_bc('p', C = 1, k=Nk+1)
         self.BC.add_bc('p', C = -1, k=Nk+1, kdiff=-1)
 
-        self.BC.add_bc('br', C = 1., k=0)
-        self.BC.add_bc('br', C = -1., k=0, kdiff=1)
-        self.BC.add_bc('br', C = 1., k=Nk+1)
-        self.BC.add_bc('br', C = -1., k=Nk+1, kdiff=-1)
+        self.BC.add_bc('br', C = self.r[0,0]**2, k=0)
+        self.BC.add_bc('br', C = -self.r[0,0]**2, k=0, kdiff=1)
+        self.BC.add_bc('br', C = self.r[-1,0]**2, k=Nk+1)
+        self.BC.add_bc('br', C = -self.r[-1,0]**2, k=Nk+1, kdiff=-1)
 
-        self.BC.add_bc('bth', C = 1., k=Nk+1)
-        self.BC.add_bc('bth', C = 1., k=Nk+1, kdiff=-1)
+        self.BC.add_bc('bth', C = self.r[-1,0]**2, k=Nk+1)
+        self.BC.add_bc('bth', C = self.r[-1,0]**2, k=Nk+1, kdiff=-1)
 
-        self.BC.add_bc('bph', C = 1., k=Nk+1)
-        self.BC.add_bc('bph', C = 1., k=Nk+1, kdiff=-1)
+        self.BC.add_bc('bph', C = self.r[-1,0]**2, k=Nk+1)
+        self.BC.add_bc('bph', C = self.r[-1,0]**2, k=Nk+1, kdiff=-1)
 
         self.A_rows += self.BC.rows
         self.A_cols += self.BC.cols
