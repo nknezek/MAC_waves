@@ -296,7 +296,7 @@ class Model():
             raise RuntimeError('vector given is not correct length in this \
                                model')
         else:
-            var_start = self.get_index(1, 1, var)
+            var_start = self.get_index(1, 0, var)
             var_end = self.get_index(Nk, Nl-1, var)+1
             variable = np.array(np.reshape(vector[var_start:var_end], (Nk, Nl), 'F'))
             if var in self.boundary_variables:
