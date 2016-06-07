@@ -190,8 +190,8 @@ def plot_pcolormesh_rth(model,val,vec,dir_name='./',title='pcolormesh MAC Wave P
     P_star = model.P_star
     B_star = model.B_star
     u_star = model.u_star
-    rpl = model.r[1:-1]*r_star/1e3
-    thpl = model.th[0,:]*180./np.pi
+    rpl = model.r[1:-1,:]*r_star/1e3
+    thpl = model.th[1:-1,:]*180./np.pi
     fig = plt.figure(figsize=(14,14))
     fig.suptitle(title, fontsize=14)
     gs = gridspec.GridSpec(8, 2, width_ratios=[100, 1])
@@ -246,8 +246,8 @@ def plot_vel_AGU(model,vec,dir_name='./',title='Velocity for AGU', physical_unit
     P_star = model.P_star
     B_star = model.B_star
     u_star = model.u_star
-    rpl = model.r[1:-1]*r_star/1e3
-    thpl = model.th[0,:]*180./np.pi
+    rpl = model.r[1:-1,:]*r_star/1e3
+    thpl = model.th[1:-1,:]*180./np.pi
     ur = model.get_variable(vec, 'ur', returnBC=False)*u_star
     ur[:,::2] = ur[:,::2]*-1
     urmax = np.amax(abs(ur))
@@ -308,14 +308,14 @@ def plot_buoy_struct(model, dir_name='./', title='buoyancy_structure'):
     drho = np.zeros((model.Nk,1))
     for i in range(1,model.Nk+1):
         drho[i-1] = sum(model.dr*model.r_star*drho_dr[1:i,model.Nl/2])
-    plt.plot(drho,((model.r[1:-1]-1)*model.r_star)/1000)
-#    plt.plot(drho_dr[1:-1,model.Nl/2]*1e6,(model.r[1:-1]-1)*model.r_star/1000)
+    plt.plot(drho,((model.r[1:-1,0]-1)*model.r_star)/1000)
+#    plt.plot(drho_dr[1:-1,model.Nl/2]*1e6,(model.r[1:-1,0]-1)*model.r_star/1000)
     plt.title('density perturbation off adiabat')
     plt.ylabel('depth below CMB (km)')
     plt.xlabel('density perturbation off adiabat (kg/m^4)')
 
     plt.subplot(1,2,2)
-    plt.plot(model.omega_g[1:-1,model.Nl/2]*model.t_star,(model.r[1:-1]-1)*model.r_star/1000)
+    plt.plot(model.omega_g[1:-1,model.Nl/2]*model.t_star,(model.r[1:-1,0]-1)*model.r_star/1000)
     plt.title('buoyancy frequency')
     plt.ylabel('depth below CMB (km)')
     plt.xlabel('buoyancy frequency (omega_g/Omega)')
@@ -353,7 +353,7 @@ def plot_B(model, dir_name='./', title='B field structure'):
 def plot_Uphi(model, dir_name='./', title='Uphi structure'):
     plt.close('all')
     fig = plt.figure(figsize=(10,5))
-    plt.pcolor(model.th[0,:]*180./np.pi,(model.r[1:-1]-1)*model.r_star/1000,model.Uphi[1:-1,1:-1]*model.u_star)
+    plt.pcolor(model.th[1:-1,:]*180./np.pi,(model.r[1:-1,:]-1)*model.r_star/1000,model.Uphi[1:-1,:]*model.u_star)
     plt.colorbar()
     plt.title('Uphi background velocity field')
     plt.ylabel('depth below CMB (km)')

@@ -583,7 +583,7 @@ class GovEquation():
         Nl = self.model.Nl
 
         if l_vals is None:
-            l_vals = range(max(0,-ldiff),Nl-1+min(0,-ldiff))
+            l_vals = range(max(0,-ldiff),Nl+min(0,-ldiff))
         if k_vals is None:
             k_vals = range(1,Nk+1)
 

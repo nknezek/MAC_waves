@@ -3,8 +3,6 @@ import numpy as np
 """ Configuration File for SLEPc Run solving MAC model """
 
 T_list = [80.1]
-#T_list = [53., 99.]
-#T_list = [41.,77.]
 delta_T = 30.
 
 nev = 10
@@ -30,7 +28,8 @@ tol = 1e-8
 
 dCyr_list = [68.44627]
 data_dir = [
-    '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix/',
+    '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix2/',
+    # '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix/',
     # '../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB31_python3/',
 # '../data/k20_l200_m0_nu8e-01_139km_constantG100_absDipoleBrB31_8d7f6ab/'
 ]
