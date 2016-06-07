@@ -1,12 +1,12 @@
 import numpy as np
 
 
-def apply_D3sq(model, vec):
+def apply_d2(model, vec):
     try:
-        model.D3sqMat
+        model.d2Mat
     except:
-        model.make_D3sqMat()
-    return model.D3sqMat.tocsr()*vec
+        model.make_d2Mat()
+    return model.d2Mat.tocsr()*vec
 
 
 def apply_dth(model, vec):
@@ -17,18 +17,18 @@ def apply_dth(model, vec):
     return model.dthMat.tocsr()*vec
 
 
-def get_max_D3sq_norm(model, vec, var=None):
+def get_max_d2_norm(model, vec, var=None):
     if var:
-        D3sq_var = model.get_variable(apply_D3sq(vec), var, returnBC=False)
+        d2_var = model.get_variable(apply_d2(vec), var, returnBC=False)
         var_out = model.get_variable(vec, var, returnBC=False)
-        return abs(D3sq_var).max()/abs(var_out).max()
+        return abs(d2_var).max()/abs(var_out).max()
     else:
         maxes = []
-        D3sq_vec = apply_D3sq(model, vec)
+        d2_vec = apply_d2(model, vec)
         for var in model.model_variables:
-            D3sq_var = model.get_variable(D3sq_vec, var, returnBC=False)
+            d2_var = model.get_variable(d2_vec, var, returnBC=False)
             var_out = model.get_variable(vec, var, returnBC=False)
-            maxes.append(abs(D3sq_var).max()/abs(var_out).max())
+            maxes.append(abs(d2_var).max()/abs(var_out).max())
     return max(maxes)
 
 
@@ -107,11 +107,11 @@ def filter_by_dth(model, vals, vecs, max_dth):
     return filtered_vals, filtered_vecs
 
 
-def filter_by_D3sq(model, vals, vecs, max_D3sq):
+def filter_by_d2(model, vals, vecs, max_d2):
     filtered_vals = []
     filtered_vecs = []
     for ind, (val, vec) in enumerate(zip(vals, vecs)):
-        if get_max_D3sq_norm(model, vec) < max_D3sq:
+        if get_max_d2_norm(model, vec) < max_d2:
             filtered_vals.append(val)
             filtered_vecs.append(vec)
     return filtered_vals, filtered_vecs

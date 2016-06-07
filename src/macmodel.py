@@ -431,19 +431,19 @@ class Model():
         else:
             self.M = M
 
-    def make_D3sqMat(self):
-        self.D3sq_rows = []
-        self.D3sq_cols = []
-        self.D3sq_vals = []
+    def make_d2Mat(self):
+        self.d2_rows = []
+        self.d2_cols = []
+        self.d2_vals = []
         for var in self.boundary_variables:
-            self.add_gov_equation('D3sq_'+var, var)
-            exec('self.D3sq_'+var+'.add_D3sq(\''+var+'\','+str(self.m)+')')
-            exec('self.D3sq_rows = self.D3sq_'+var+'.rows')
-            exec('self.D3sq_cols = self.D3sq_'+var+'.cols')
-            exec('self.D3sq_vals = self.D3sq_'+var+'.vals')
-        self.D3sqMat = coo_matrix((self.D3sq_vals, (self.D3sq_rows, self.D3sq_cols)),
+            self.add_gov_equation('d2_'+var, var)
+            exec('self.d2_'+var+'.add_d2(\''+var+'\','+str(self.m)+')')
+            exec('self.d2_rows = self.d2_'+var+'.rows')
+            exec('self.d2_cols = self.d2_'+var+'.cols')
+            exec('self.d2_vals = self.d2_'+var+'.vals')
+        self.d2Mat = coo_matrix((self.d2_vals, (self.d2_rows, self.d2_cols)),
                                shape=(self.SizeM, self.SizeM))
-        return self.D3sqMat
+        return self.d2Mat
 
     def make_dthMat(self):
         self.dth_rows = []
