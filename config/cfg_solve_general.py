@@ -8,7 +8,7 @@ T_list = [80.1]
 delta_T = 30.
 
 nev = 10
-D3sq_filter = 10e8
+d2_filter = 10e8
 dth_filter = 10e8
 eq_split = 1.0
 eq_var = 'p'

@@ -32,7 +32,7 @@ def find_closest_CC(Target, dCyr_list):
 
 # Import constant parameters from config file
 nev = cfg.nev
-D3sq_filter = cfg.D3sq_filter
+d2_filter = cfg.d2_filter
 dth_filter = cfg.dth_filter
 eq_split = cfg.eq_split
 eq_var = cfg.eq_var
@@ -201,12 +201,12 @@ for cnum, c in enumerate(combinations):
             logger.info('\t{0} filtered eigenvalues to plot with power at equator, split={1:.1f}'.format(len(fvals), eq_split))
 
             # Filter by dth
-            fvals, fvecs = mana.filter_by_D3sq(model, fvals, fvecs, dth_filter)
+            fvals, fvecs = mana.filter_by_dth(model, fvals, fvecs, dth_filter)
             logger.info('\t{0} filtered eigenvalues to plot with max dth < {1:.1e}'.format(len(fvals), dth_filter))
 
             # Filter by Second Derivative
-            fvals, fvecs = mana.filter_by_D3sq(model, fvals, fvecs, D3sq_filter)
-            logger.info('\t{0} filtered eigenvalues to plot with max D3sq < {1:.1e}'.format(len(fvals), D3sq_filter))
+            fvals, fvecs = mana.filter_by_d2(model, fvals, fvecs, d2_filter)
+            logger.info('\t{0} filtered eigenvalues to plot with max d2 < {1:.1e}'.format(len(fvals), d2_filter))
 
             # %% Filter by number of zeros in theta-direction
             fvals, fvecs = mana.filter_by_theta_zeros(model, fvals, fvecs, cfg.zeros_wanted)
