@@ -231,7 +231,7 @@ class Model():
     def set_buoyancy(self, drho_dr):
         '''Sets the buoyancy structure of the layer'''
         self.omega_g = np.sqrt(-self.g/self.rho*drho_dr)
-        self.G = self.omega_g**2*self.t_star**2
+        self.N = self.omega_g**2*self.t_star**2
 
     def set_buoy_by_type(self, buoy_type, buoy_ratio):
         self.omega_g0 = buoy_ratio*self.Omega
@@ -239,7 +239,7 @@ class Model():
             self.omega_g = np.ones((self.Nk+2, self.Nl+2))*self.omega_g0
         elif buoy_type == 'linear':
             self.omega_g = (np.ones((self.Nk+2, self.Nl+2)).T*np.linspace(0, self.omega_g0, self.Nk+2)).T
-        self.G = self.omega_g**2*self.t_star**2
+        self.N = self.omega_g**2*self.t_star**2
 
     def get_index(self, k, l, var):
         '''

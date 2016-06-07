@@ -59,7 +59,7 @@ for c in combinations:
 
     # Directory name to save model
     dir_name = ('../data/k'+str(Nk) + '_l' + str(Nl) +
-                '_m{1:.0f}_nu{2:.0e}_{3:.0f}km_{7}G{4:.0f}_{6}B{5:.0f}{8}/'.format(dCyr, m, nu, h/1e3, buoy_ratio*100., Br*1e5, B_type, buoy_type, dir_suf))
+                '_m{1:.0f}_nu{2:.0e}_{3:.0f}km_{7}N{4:.0f}_{6}B{5:.0f}{8}/'.format(dCyr, m, nu, h/1e3, buoy_ratio*100., Br*1e5, B_type, buoy_type, dir_suf))
     filemodel = 'model.p' # name of model in directory
     fileA = 'A' # name of A matrix data
     fileB = 'B' # name of M matrix data
