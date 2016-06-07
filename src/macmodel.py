@@ -738,6 +738,7 @@ class GovEquation():
             self.rows.append(self.model.get_index(k, l, var))
             self.cols.append(self.model.get_index(k+kdiff, l, var))
             self.vals.append(C)
+
     def get_coo_matrix(self):
         return coo_matrix((self.vals, (self.rows, self.cols)),
                           shape=(self.model.SizeM, self.model.SizeM))

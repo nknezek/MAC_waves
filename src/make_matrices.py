@@ -149,4 +149,4 @@ for c in combinations:
     model.save_mat_PETSc(dir_name+fileA+str(dCyr)+'.dat', model.A.toPETSc(epsilon=epA))
     print('saved PETSc A matrix for dCyr = {0} to '.format(dCyr) + str(dir_name))
 
-    import pickle; pickle.dump(model.A.todense(), open('A_py3matrix.p','wb'))
+    # import pickle; pickle.dump(model.A.todense(), open('A_py3matrix.p','wb'))

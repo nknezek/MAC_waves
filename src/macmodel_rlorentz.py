@@ -97,8 +97,8 @@ class Model(macmodel.Model):
         self.rlorentz.add_dph('ur', C= Bph)
         self.rlorentz.add_dph('uph', C= -Br)
         self.rlorentz.add_d2('br', C= E/Pm)
-        self.rlorentz.add_d2r_th('bth', C= -E/Pm)
-        self.rlorentz.add_d2r_ph('bph', C= -E/Pm)
+        self.rlorentz.add_d2r_th('bth', C= E/Pm)
+        self.rlorentz.add_d2r_ph('bph', C= E/Pm)
         self.A_rows += self.rlorentz.rows
         self.A_cols += self.rlorentz.cols
         self.A_vals += self.rlorentz.vals

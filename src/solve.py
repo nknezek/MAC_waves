@@ -209,8 +209,8 @@ for cnum, c in enumerate(combinations):
             logger.info('\t{0} filtered eigenvalues to plot with max d2 < {1:.1e}'.format(len(fvals), d2_filter))
 
             # %% Filter by number of zeros in theta-direction
-            fvals, fvecs = mana.filter_by_theta_zeros(model, fvals, fvecs, cfg.zeros_wanted)
-            logger.info('\t{0} eigenvectors found with requested number of zeros'.format(len(fvecs)))
+            # fvals, fvecs = mana.filter_by_theta_zeros(model, fvals, fvecs, cfg.zeros_wanted)
+            # logger.info('\t{0} eigenvectors found with requested number of zeros'.format(len(fvecs)))
 
             # %% Filter by Quality Factor
             fvals, fvecs = mana.filter_by_Q(model, fvals, fvecs, cfg.min_Q)
