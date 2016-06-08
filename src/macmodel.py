@@ -704,6 +704,27 @@ class GovEquation():
         self.add_term(var, C*self.model.d2_lm1, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.d2, k_vals=k_vals, l_vals=l_vals)
 
+    def add_d2_b0(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.d2_kp1_b0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_km1_b0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lp1_b0, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lm1_b0, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_b0, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2_bd0(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.d2_kp1_bd0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_km1_bd0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lp1_bd0, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lm1_bd0, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_bd0, k_vals=k_vals, l_vals=l_vals)
+
+    def add_d2_ccb0(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.d2_kp1_ccb0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_km1_ccb0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lp1_ccb0, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_lm1_ccb0, ldiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.d2_ccb0, k_vals=k_vals, l_vals=l_vals)
+
     def add_d2r_th(self, var, C=1., k_vals=None, l_vals=None):
         """
 
