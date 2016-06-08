@@ -19,10 +19,19 @@ from slepc4py import SLEPc
 opts = PETSc.Options()
 
 # Import configuration file
+default_config = "cfg_solve_general"
 sys.path.append('../config')
-config_file = sys.argv[1].rstrip('\.py')
-cfg = importlib.import_module(config_file)
-print("used config file {0}".format(config_file))
+try:
+    config_file = sys.argv[1].rstrip('\.py')
+    cfg = importlib.import_module(config_file)
+    print("used config file from command line {0}".format(config_file))
+except:
+    try:
+        config_file = default_config
+        cfg = importlib.import_module(config_file)
+        print("used default config file "+default_config)
+    except:
+        raise ImportError("Could not import config file")
 
 # function to find nearest skin-depth value for a wave period
 def find_closest_CC(Target, dCyr_list):

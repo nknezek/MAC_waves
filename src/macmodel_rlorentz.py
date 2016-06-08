@@ -67,7 +67,7 @@ class Model(macmodel.Model):
 
         # Phi-Momentum
         self.add_gov_equation('pmom', 'uph')
-        self.pmom.add_dphP('p', -1)
+        self.pmom.add_dphP('p', C= -1)
         self.pmom.add_term('uth', -2.0*cos(th))
         # self.pmom.add_term('ur', 2.0*sin(th))
 

@@ -7,10 +7,19 @@ import numpy as np
 import importlib
 
 # Import configuration file
+default_config = "cfg_make_general"
 sys.path.append('../config')
-config_file = sys.argv[1].rstrip('\.py')
-cfg = importlib.import_module(config_file)
-print("used config file {0}".format(config_file))
+try:
+    config_file = sys.argv[1].rstrip('\.py')
+    cfg = importlib.import_module(config_file)
+    print("used config file from command line {0}".format(config_file))
+except:
+    try:
+        config_file = default_config
+        cfg = importlib.import_module(config_file)
+        print("used default config file " + default_config)
+    except:
+        raise ImportError("could not find a configuration file")
 
 # Store constant parameters
 mlog = cfg.mlog
