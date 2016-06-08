@@ -259,10 +259,9 @@ class Model():
             raise RuntimeError('variable not in model_variables')
         elif not (l >= 0 and l <= Nl-1):
             raise RuntimeError('l index out of bounds')
-        elif not ((k >= 0 and k <= Nk-1):
+        elif not (k >= 0 and k <= Nk-1):
             raise RuntimeError('k index out of bounds')
-        else:
-            return Size_var*self.model_variables.index(var) + k + l*Nk
+        return Size_var*self.model_variables.index(var) + k + l*Nk
 
     def get_variable(self, vector, var, returnBC=True):
         '''
@@ -651,6 +650,29 @@ class GovEquation():
         self.add_term(var, C*self.model.ddr_kp1, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.ddr_km1, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.ddr, k_vals=k_vals, l_vals=l_vals)
+
+    def add_dr_b0(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :return:
+        """
+        self.add_term(var, C*self.model.ddr_kp1_b0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_km1_b0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_b0, k_vals=k_vals, l_vals=l_vals)
+
+    def add_dr_bd0(self, var, C=1., k_vals=None, l_vals=None):
+        self.add_term(var, C*self.model.ddr_kp1_bd0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_km1_bd0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_bd0, k_vals=k_vals, l_vals=l_vals)
+
+    def add_dr_ccb(self, var, C=1., k_vals=None, l_vals=None):
+        """
+
+        :return:
+        """
+        self.add_term(var, C*self.model.ddr_kp1_ccb, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_km1_ccb, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_ccb, k_vals=k_vals, l_vals=l_vals)
 
     def add_dth(self, var, C=1, k_vals=None, l_vals=None):
         self.add_term(var, C*self.model.ddth_lp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)
