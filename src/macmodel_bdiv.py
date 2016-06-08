@@ -28,7 +28,7 @@ class Model(macmodel.Model):
         self.rmom.add_term('r_disp', -N**2)
         # self.rmom.add_term('uph', 2.0*sin(th))
 
-        self.rmom.add_d2('ur', C= E)
+        self.rmom.add_d2_b0('ur', C= E)
         self.rmom.add_d2r_th('uth', C= E)
         self.rmom.add_d2r_ph('uph', C= E)
 
@@ -49,11 +49,11 @@ class Model(macmodel.Model):
         self.tmom.add_dthP('p', C= -1)
         self.tmom.add_term('uph', 2.0*cos(th))
 
-        self.tmom.add_d2('uth', C= E)
+        self.tmom.add_d2_bd0('uth', C= E)
         self.tmom.add_d2th_r('ur', C= E)
         self.tmom.add_d2th_ph('uph', C= E)
 
-        self.tmom.add_dr('bth', C= E/Pm*Br)
+        self.tmom.add_dr_ccb('bth', C= E/Pm*Br)
         # self.tmom.add_dr('br', C= -E/Pm*Bth)
         # self.tmom.add_dth('bth', C= E/Pm*Bth)
         self.tmom.add_dth('br', C= -E/Pm*Br)
@@ -71,11 +71,11 @@ class Model(macmodel.Model):
         self.pmom.add_term('uth', -2.0*cos(th))
         # self.pmom.add_term('ur', 2.0*sin(th))
 
-        self.pmom.add_d2('uph', C= E)
+        self.pmom.add_d2_bd0('uph', C= E)
         self.pmom.add_d2ph_r('ur', C= E)
         self.pmom.add_d2ph_th('uth', C= E)
 
-        self.pmom.add_dr('bph', C= E/Pm*Br)
+        self.pmom.add_dr_ccb('bph', C= E/Pm*Br)
         # self.pmom.add_dr('br', C= -E/Pm*Bph)
         # self.pmom.add_dth('bph', C= E/Pm*Bth)
         # self.pmom.add_dth('bth', C= E/Pm*Bph)
@@ -93,7 +93,7 @@ class Model(macmodel.Model):
 
         # B-divergence replaces r-lorentz
         self.add_gov_equation('bdiv', 'br')
-        self.bdiv.add_dr('br')
+        self.bdiv.add_dr_bd0('br')
         self.bdiv.add_dth('bth')
         self.bdiv.add_dph('bph')
         self.A_rows += self.bdiv.rows
@@ -103,12 +103,12 @@ class Model(macmodel.Model):
 
         # theta-Lorentz
         self.add_gov_equation('thlorentz', 'bth')
-        self.thlorentz.add_dr('uth', C= Br)
+        self.thlorentz.add_dr_bd0('uth', C= Br)
         # self.thlorentz.add_dr('ur', C= -Bth)
         # self.thlorentz.add_dph('uth', C= Bph)
         # self.thlorentz.add_dph('uph', C= -Bth)
 
-        self.thlorentz.add_d2('bth', C= E/Pm)
+        self.thlorentz.add_d2_ccb('bth', C= E/Pm)
         self.thlorentz.add_d2th_r('br', C= E/Pm)
         self.thlorentz.add_d2th_ph('bph', C= E/Pm)
 
@@ -119,12 +119,12 @@ class Model(macmodel.Model):
 
         # phi-Lorentz
         self.add_gov_equation('phlorentz', 'bph')
-        self.phlorentz.add_dr('uph', C= Br)
+        self.phlorentz.add_dr_bd0('uph', C= Br)
         # self.phlorentz.add_dr('ur', C= -Bph)
         # self.phlorentz.add_dth('uph', C= Bth)
         # self.phlorentz.add_dth('uth', C= -Bph)
 
-        self.phlorentz.add_d2('bph', C= E/Pm)
+        self.phlorentz.add_d2_ccb('bph', C= E/Pm)
         self.phlorentz.add_d2ph_r('br', C= E/Pm)
         self.phlorentz.add_d2ph_th('bth', C= E/Pm)
 
@@ -135,7 +135,7 @@ class Model(macmodel.Model):
 
         # Divergence (Mass Conservation) #########
         self.add_gov_equation('div', 'p')
-        self.div.add_dr('ur')
+        self.div.add_dr_b0('ur')
         self.div.add_dth('uth')
         self.div.add_dph('uph')
         self.A_rows += self.div.rows
@@ -151,72 +151,6 @@ class Model(macmodel.Model):
         self.A_vals += self.rdisp.vals
         del self.rdisp
 
-        # Boundary Conditions
-        self.add_gov_equation('BC', 'p')
-
-        self.BC.add_bc('ur', C = self.r[0,0]**2, k=0)
-        self.BC.add_bc('ur', C = self.r[0,0]**2, k=0, kdiff=1)
-        self.BC.add_bc('ur', C = self.r[-1,0]**2, k=Nk+1)
-        self.BC.add_bc('ur', C = self.r[-1,0]**2, k=Nk+1, kdiff=-1)
-
-        self.BC.add_bc('uth', C = self.r[0,0]**2, k=0)
-        self.BC.add_bc('uth', C = -self.r[0,0]**2, k=0, kdiff=1)
-        self.BC.add_bc('uth', C = self.r[-1,0]**2, k=Nk+1)
-        self.BC.add_bc('uth', C = -self.r[-1,0]**2, k=Nk+1, kdiff=-1)
-
-        self.BC.add_bc('uph', C = self.r[0,0]**2, k=0)
-        self.BC.add_bc('uph', C = -self.r[0,0]**2, k=0, kdiff=1)
-        self.BC.add_bc('uph', C = self.r[-1,0]**2, k=Nk+1)
-        self.BC.add_bc('uph', C = -self.r[-1,0]**2, k=Nk+1, kdiff=-1)
-
-        self.BC.add_bc('p', C = 1, k=0)
-        self.BC.add_bc('p', C = -1, k=0, kdiff=1)
-        self.BC.add_bc('p', C = 1, k=Nk+1)
-        self.BC.add_bc('p', C = -1, k=Nk+1, kdiff=-1)
-
-        self.BC.add_bc('br', C = self.r[0,0]**2, k=0)
-        self.BC.add_bc('br', C = -self.r[0,0]**2, k=0, kdiff=1)
-        self.BC.add_bc('br', C = self.r[-1,0]**2, k=Nk+1)
-        self.BC.add_bc('br', C = -self.r[-1,0]**2, k=Nk+1, kdiff=-1)
-
-        self.BC.add_bc('bth', C = self.r[-1,0]**2, k=Nk+1)
-        self.BC.add_bc('bth', C = self.r[-1,0]**2, k=Nk+1, kdiff=-1)
-
-        self.BC.add_bc('bph', C = self.r[-1,0]**2, k=Nk+1)
-        self.BC.add_bc('bph', C = self.r[-1,0]**2, k=Nk+1, kdiff=-1)
-
-        self.A_rows += self.BC.rows
-        self.A_cols += self.BC.cols
-        self.A_vals += self.BC.vals
-        del self.BC
-
-        # Conducting-Core Boundary Condition
-        self.add_gov_equation('CCBC', 'p')
-
-        for l in range(0, Nl):
-            row = {'k': 0, 'l': l, 'var': 'bth'}
-            self.CCBC.add_value(str(Br[0, l]/2.), row,
-                              {'k': 0, 'l': l, 'var': 'uth'})
-            self.CCBC.add_value(str(Br[1, l]/2.), row,
-                              {'k': 1, 'l': l, 'var': 'uth'})
-            self.CCBC.add_value(str(E/Pm*(-1/self.dr - self.r_star/(2*self.delta_C*(1+1j)))),
-                              row, {'k': 0, 'l': l, 'var': 'bth'})
-            self.CCBC.add_value(str(E/Pm*(1/self.dr - self.r_star/(2*self.delta_C*(1+1j)))),
-                              row, {'k': 1, 'l': l, 'var': 'bth'})
-        for l in range(0, Nl):
-            row = {'k': 0, 'l': l, 'var': 'bph'}
-            self.CCBC.add_value(str(Br[0, l]/2.), row,
-                              {'k': 0, 'l': l, 'var': 'uph'})
-            self.CCBC.add_value(str(Br[1, l]/2.), row,
-                              {'k': 1, 'l': l, 'var': 'uph'})
-            self.CCBC.add_value(str(E/Pm*(-1/self.dr - self.r_star/(2*self.delta_C*(1+1j)))),
-                              row, {'k': 0, 'l': l, 'var': 'bph'})
-            self.CCBC.add_value(str(E/Pm*(1/self.dr - self.r_star/(2*self.delta_C*(1+1j)))),
-                              row, {'k': 1, 'l': l, 'var': 'bph'})
-        self.A_rows += self.CCBC.rows
-        self.A_cols += self.CCBC.cols
-        self.A_vals += self.CCBC.vals
-        del self.CCBC
         self.A = macmodel.coo_matrix((self.A_vals, (self.A_rows, self.A_cols)),
                                    shape=(self.SizeM, self.SizeM))
         del self.A_vals, self.A_rows, self.A_cols
@@ -246,12 +180,12 @@ class Model(macmodel.Model):
         # self.B_vals += self.B_uph.vals
         # del self.B_uph
         #
-        self.add_gov_equation('B_rlorentz', 'br')
-        self.B_rlorentz.add_term('br', ones)
-        self.B_rows = self.B_rlorentz.rows
-        self.B_cols = self.B_rlorentz.cols
-        self.B_vals = self.B_rlorentz.vals
-        del self.B_rlorentz
+        # self.add_gov_equation('B_rlorentz', 'br')
+        # self.B_rlorentz.add_term('br', ones)
+        # self.B_rows = self.B_rlorentz.rows
+        # self.B_cols = self.B_rlorentz.cols
+        # self.B_vals = self.B_rlorentz.vals
+        # del self.B_rlorentz
 
         self.add_gov_equation('B_thlorentz', 'bth')
         self.B_thlorentz.add_term('bth', ones)
