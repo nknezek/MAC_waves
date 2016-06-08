@@ -28,7 +28,8 @@ tol = 1e-8
 
 dCyr_list = [68.44627]
 data_dir = [
-    '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix7/',
+    '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_bdiv/',
+    # '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix7/',
     # '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix5/',
     # '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix4/',
     # '../data/k20_l200_m0_nu8e-01_139km_constantN100_absDipoleBrB31_py3matrix3/',

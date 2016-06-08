@@ -90,19 +90,16 @@ class Model(macmodel.Model):
         ################################
         # Lorentz Equation ##########
         ################################
-        # r-Lorentz
-        self.add_gov_equation('rlorentz', 'br')
-        self.rlorentz.add_dth('ur', C= Bth)
-        self.rlorentz.add_dth('uth', C= -Br)
-        self.rlorentz.add_dph('ur', C= Bph)
-        self.rlorentz.add_dph('uph', C= -Br)
-        self.rlorentz.add_d2('br', C= E/Pm)
-        self.rlorentz.add_d2r_th('bth', C= E/Pm)
-        self.rlorentz.add_d2r_ph('bph', C= E/Pm)
-        self.A_rows += self.rlorentz.rows
-        self.A_cols += self.rlorentz.cols
-        self.A_vals += self.rlorentz.vals
-        del self.rlorentz
+
+        # B-divergence replaces r-lorentz
+        self.add_gov_equation('bdiv', 'br')
+        self.bdiv.add_dr('br')
+        self.bdiv.add_dth('bth')
+        self.bdiv.add_dph('bph')
+        self.A_rows += self.bdiv.rows
+        self.A_cols += self.bdiv.cols
+        self.A_vals += self.bdiv.vals
+        del self.bdiv
 
         # theta-Lorentz
         self.add_gov_equation('thlorentz', 'bth')
