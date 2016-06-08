@@ -753,10 +753,9 @@ class GovEquation():
 class csr_matrix(scipy.sparse.csr.csr_matrix):
     ''' Subclass to allow conversion to PETSc matrix format'''
     def toPETSc(self, epsilon=1e-12):
-        ind = self.nonzero()
         Mat = PETSc.Mat().createAIJ(size=self.shape)
         Mat.setUp()
-        for i, j, val in zip(ind[0], ind[1], self.data):
+        for i, j, val in zip(self.row, self.col, self.data):
             Mat.setValue(i, j, val)
         # If any diagnoal elements are zero, replace with epsilon
         for ind, val in enumerate(self.diagonal()):
@@ -790,10 +789,9 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
     ''' Subclass to allow conversion to PETSc matrix format'''
     def toPETSc(self, epsilon=1e-12):
         csr_mat = self.tocsr()
-        ind = csr_mat.nonzero()
         Mat = PETSc.Mat().createAIJ(size=self.shape)
         Mat.setUp()
-        for i, j, val in zip(ind[0], ind[1], csr_mat.data):
+        for i, j, val in zip(self.row, self.col, csr_mat.data):
             Mat.setValue(i, j, val)
         # If any diagnoal elements are zero, replace with epsilon
         for ind, val in enumerate(self.diagonal()):
@@ -805,10 +803,9 @@ class coo_matrix(scipy.sparse.coo.coo_matrix):
 
     def toPETSc_unassembled(self, epsilon=1e-10):
         csr_mat = self.tocsr()
-        ind = csr_mat.nonzero()
         Mat = PETSc.Mat().createAIJ(size=self.shape)
         Mat.setUp()
-        for i, j, val in zip(ind[0], ind[1], csr_mat.data):
+        for i, j, val in zip(self.row, self.col, csr_mat.data):
             Mat.setValue(i, j, val)
         # If any diagnoal elements are zero, replace with epsilon
         for ind, val in enumerate(self.diagonal()):

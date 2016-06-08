@@ -9,8 +9,8 @@ import pickle as pkl
 m = [0]
 
 # Size of grid
-Nk = 20 # Radial cells
-Nl = 200 # Latitudinal cells
+Nk = 4 # Radial cells
+Nl = 4 # Latitudinal cells
 
 # Define Physical Constants
 R = 3480e3  # Outer core radius in (m)
@@ -51,5 +51,5 @@ buoy_ratio =  [1.0]
 # model parameters
 model_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p', 'r_disp')
 boundary_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p')
-dir_suf = '_py3matrix4'
+dir_suf = '_py3matrix5'
 ep = 1e-3

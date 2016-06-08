@@ -127,7 +127,7 @@ for c in combinations:
     #==============================================================================
     model.make_Bobs()
     print('created Bobs matrix')
-#    model.make_D3sqMat()
+#    model.make_d2Mat()
 #    print('created D3sq matrix')
 #    model.make_dthMat()
 #    print('created dth matrix')
