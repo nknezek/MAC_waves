@@ -12,7 +12,6 @@ import pickle as pkl
 class Model():
     def __init__(self, model_variables, model_parameters, physical_constants):
         self.model_variables = model_variables
-        self.boundary_variables = boundary_variables
         self.model_parameters = model_parameters
         self.physical_constants = physical_constants
 
@@ -243,9 +242,8 @@ class Model():
         '''
         Takes coordinates for a point, gives back index in matrix.
         inputs:
-            k: k grid value from 1 to K (or 0 to K+1 for variables with
-                boundary conditions)
-            l: l grid value from 1 to L
+            k: k grid value from 0 to K-1
+            l: l grid value from 0 to L-1
             var: variable name in model_variables
         outputs:
             index of location in matrix
@@ -266,13 +264,12 @@ class Model():
     def get_variable(self, vector, var, returnBC=True):
         '''
         Takes a flat vector and a variable name, returns the variable in a
-        np.matrix and the bottom and top boundary vectors
+        np.matrix
         inputs:
             vector: flat vector array with len == SizeM
             var: str of variable name in model
         outputs:
-            if boundary exists: variable, bottom_boundary, top_boundary
-            if no boundary exists: variable
+            variable in np.array
         '''
         Nk = self.Nk
         Nl = self.Nl
@@ -290,12 +287,11 @@ class Model():
 
     def create_vector(self, variables):
         '''
-        Takes a set of variables and boundaries and creates a vector out of
+        Takes a set of variables and creates a vector out of
         them.
         inputs:
             variables: list of (Nk x Nl) matrices or vectors for each model
                 variable
-            boundaries: list of 2 X Nl matrices or vectors for each boundary
         outputs:
             vector of size (SizeM x 1)
         '''
@@ -404,9 +400,9 @@ class Model():
         self.d2_rows = []
         self.d2_cols = []
         self.d2_vals = []
-        for var in self.boundary_variables:
+        for var in self.model_variables:
             self.add_gov_equation('d2_'+var, var)
-            exec('self.d2_'+var+'.add_d2(\''+var+'\','+str(self.m)+')')
+            exec('self.d2_'+var+'.add_d2_bd0(\''+var+'\','+str(self.m)+')')
             exec('self.d2_rows = self.d2_'+var+'.rows')
             exec('self.d2_cols = self.d2_'+var+'.cols')
             exec('self.d2_vals = self.d2_'+var+'.vals')
@@ -418,7 +414,7 @@ class Model():
         self.dth_rows = []
         self.dth_cols = []
         self.dth_vals = []
-        for var in self.boundary_variables:
+        for var in self.model_variables:
             self.add_gov_equation('dth_'+var, var)
             exec('self.dth_'+var+'.add_dth(\''+var+'\','+str(self.m)+')')
             exec('self.dth_rows += self.dth_'+var+'.rows')
@@ -432,7 +428,7 @@ class Model():
         self.dph_rows = []
         self.dph_cols = []
         self.dph_vals = []
-        for var in self.boundary_variables:
+        for var in self.model_variables:
             self.add_gov_equation('dth_'+var, var)
             exec('self.dph_'+var+'.add_dth(\''+var+'\','+str(self.m)+')')
             exec('self.dph_rows += self.dth_'+var+'.rows')
@@ -792,27 +788,6 @@ class GovEquation():
         :return:
         """
         self.add_term(var, C*self.model.d2ph_th, k_vals=k_vals, l_vals=l_vals)
-
-    def add_bc(self, var, C=1., k=0, kdiff=0, l_vals=None):
-        """
-
-        :param var:
-        :param C:
-        :param k_vals:
-        :param l_vals:
-        :return:
-        """
-
-        if l_vals is None:
-            l_vals = range(self.model.Nl)
-
-        if var not in self.model.boundary_variables:
-            raise RuntimeError('variable is not in boundary_variables')
-
-        for l in l_vals:
-            self.rows.append(self.model.get_index(k, l, var))
-            self.cols.append(self.model.get_index(k+kdiff, l, var))
-            self.vals.append(C)
 
     def get_coo_matrix(self):
         return coo_matrix((self.vals, (self.rows, self.cols)),
