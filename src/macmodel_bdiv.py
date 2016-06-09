@@ -108,7 +108,7 @@ class Model(macmodel.Model):
         # self.thlorentz.add_dph('uth', C= Bph)
         # self.thlorentz.add_dph('uph', C= -Bth)
 
-        self.thlorentz.add_d2_ccb('bth', C= E/Pm)
+        self.thlorentz.add_d2_ccb0('bth', C= E/Pm)
         self.thlorentz.add_d2th_r('br', C= E/Pm)
         self.thlorentz.add_d2th_ph('bph', C= E/Pm)
 
@@ -124,7 +124,7 @@ class Model(macmodel.Model):
         # self.phlorentz.add_dth('uph', C= Bth)
         # self.phlorentz.add_dth('uth', C= -Bph)
 
-        self.phlorentz.add_d2_ccb('bph', C= E/Pm)
+        self.phlorentz.add_d2_ccb0('bph', C= E/Pm)
         self.phlorentz.add_d2ph_r('br', C= E/Pm)
         self.phlorentz.add_d2ph_th('bth', C= E/Pm)
 
