@@ -41,7 +41,7 @@ sin_exp = 0.0
 Bnoise = 0.3e-3
 
 # background velocity field in (m/s)
-Uphi = np.ones((Nk+2, Nl))*0.0
+Uphi = np.ones((Nk, Nl))*0.0
 
 # Buoyancy Frequency
 # choices: constant, linear
@@ -51,5 +51,5 @@ buoy_ratio =  [1.0]
 # model parameters
 model_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p', 'r_disp')
 boundary_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p')
-dir_suf = '_bdiv'
+dir_suf = '_strongbc'
 ep = 1e-3
