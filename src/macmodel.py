@@ -217,7 +217,7 @@ class Model():
     def set_Uphi(self, Uphi):
         '''Sets the background velocity field in m/s'''
         if isinstance(Uphi, (float, int)):
-            self.Uphi = np.ones((self.Nk, self.Nl+2))*Uphi
+            self.Uphi = np.ones((self.Nk, self.Nl))*Uphi
         elif isinstance(Uphi, np.ndarray):
             self.Uphi = Uphi
         else:

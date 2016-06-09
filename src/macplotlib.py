@@ -151,30 +151,30 @@ def plot_A(A,m):
     plt.title('A,m='+str(m)+' matrix all terms (M*l*x = A*x)')
     plt.savefig('./output/m={0}/A_matrix_m={0}.png'.format(m))
     # plt.subplot(3,2,2)
-#   plt.spy(np.abs(A.todense().real))
-#   plt.grid()
-#   plt.title('A'+str(m)+' real')
-#
-#   plt.subplot(3,2,3)
-#   plt.spy(np.abs(A.todense().imag))
-#   plt.grid()
-#   plt.title('A'+str(m)+' imaginary')
-#
-#   A_pos = np.matrix(A.todense())
-#   A_pos[A.todense()<0.] = 0
-#   plt.subplot(3,2,4)
-#   plt.spy(np.abs(A_pos))
-#   plt.grid()
-#   plt.title('A'+str(m)+' positive')
-#
-#   A_neg = np.matrix(A.todense())
-#   A_neg[A.todense()>0.] = 0
-#   plt.subplot(3,2,5)
-#   plt.spy(np.abs(A_neg))
-#   plt.grid()
-#   plt.title('A'+str(m)+' negative')
-#   plt.tight_layout()
-#   plt.savefig('./output/m={0}/A_matrix_m={0}.png'.format(m))
+    # plt.spy(np.abs(A.todense().real))
+    # plt.grid()
+    # plt.title('A'+str(m)+' real')
+    #
+    # plt.subplot(3,2,3)
+    # plt.spy(np.abs(A.todense().imag))
+    # plt.grid()
+    # plt.title('A'+str(m)+' imaginary')
+    #
+    # A_pos = np.matrix(A.todense())
+    # A_pos[A.todense()<0.] = 0
+    # plt.subplot(3,2,4)
+    # plt.spy(np.abs(A_pos))
+    # plt.grid()
+    # plt.title('A'+str(m)+' positive')
+    #
+    # A_neg = np.matrix(A.todense())
+    # A_neg[A.todense()>0.] = 0
+    # plt.subplot(3,2,5)
+    # plt.spy(np.abs(A_neg))
+    # plt.grid()
+    # plt.title('A'+str(m)+' negative')
+    # plt.tight_layout()
+    # plt.savefig('./output/m={0}/A_matrix_m={0}.png'.format(m))
 
 def plot_M(M,m):
     plt.figure(figsize=(10,10))
@@ -182,7 +182,6 @@ def plot_M(M,m):
     plt.spy(np.abs(M.todense()))
     plt.grid()
     plt.savefig('./output/m={0}/M_matrix_m={0}.png'.format(m))
-
 
 def plot_pcolormesh_rth(model,val,vec,dir_name='./',title='pcolormesh MAC Wave Plot', physical_units = False, oscillate_values=False):
     plt.close('all')
@@ -298,7 +297,7 @@ def plot_vel_AGU(model,vec,dir_name='./',title='Velocity for AGU', physical_unit
 
     fig.tight_layout()
     plt.subplots_adjust(top=0.9)
-#    plt.savefig(dir_name+title+'.png')
+    # plt.savefig(dir_name+title+'.png')
 
 def plot_buoy_struct(model, dir_name='./', title='buoyancy_structure'):
     plt.close('all')
@@ -321,7 +320,6 @@ def plot_buoy_struct(model, dir_name='./', title='buoyancy_structure'):
     plt.xlabel('buoyancy frequency (omega_g/Omega)')
     fig.tight_layout()
     plt.savefig(dir_name+title+'.png')
-
 
 def plot_B(model, dir_name='./', title='B field structure'):
     plt.close('all')
@@ -353,7 +351,7 @@ def plot_B(model, dir_name='./', title='B field structure'):
 def plot_Uphi(model, dir_name='./', title='Uphi structure'):
     plt.close('all')
     fig = plt.figure(figsize=(10,5))
-    plt.pcolor(model.th*180./np.pi,(model.r-1)*model.r_star/1000,model.Uphi*model.u_star)
+    plt.pcolor(model.th*180./np.pi, (model.r-1)*model.r_star/1000, model.Uphi*model.u_star)
     plt.colorbar()
     plt.title('Uphi background velocity field')
     plt.ylabel('depth below CMB (km)')
