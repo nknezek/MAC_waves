@@ -491,12 +491,12 @@ class Model():
         self.ddr_bd0[0,:] = (rp[0,:]**2 - 2*rm[0,:]**2)/(2*r[0,:]**2*dr)
 
         # ddr for Conducting core boundary conditions
-        self.ddr_kp1_ccb = np.array(self.ddr_kp1_bd0)
-        self.ddr_kp1_ccb[0,:] = 1/r[0,:]
-        self.ddr_km1_ccb = np.array(self.ddr_km1_bd0)
-        self.ddr_km1_ccb[0,:] = np.zeros(Nl)
-        self.ddr_ccb = np.array(self.ddr_bd0)
-        self.ddr_ccb = np.ones(Nl)/dr
+        self.ddr_kp1_ccb0 = np.array(self.ddr_kp1_b0)
+        self.ddr_kp1_ccb0[0,:] = 1/r[0,:]
+        self.ddr_km1_ccb0 = np.array(self.ddr_km1_b0)
+        self.ddr_km1_ccb0[0,:] = np.zeros(Nl)
+        self.ddr_ccb0 = np.array(self.ddr_b0)
+        self.ddr_ccb0 = np.ones(Nl)/dr
 
         # ddth
         self.ddth_lp1 = sin(thp)/(2*r*sin(th)*dth)
@@ -659,14 +659,14 @@ class GovEquation():
         self.add_term(var, C*self.model.ddr_km1_bd0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
         self.add_term(var, C*self.model.ddr_bd0, k_vals=k_vals, l_vals=l_vals)
 
-    def add_dr_ccb(self, var, C=1., k_vals=None, l_vals=None):
+    def add_dr_ccb0(self, var, C=1., k_vals=None, l_vals=None):
         """
 
         :return:
         """
-        self.add_term(var, C*self.model.ddr_kp1_ccb, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, C*self.model.ddr_km1_ccb, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
-        self.add_term(var, C*self.model.ddr_ccb, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_kp1_ccb0, kdiff=+1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_km1_ccb0, kdiff=-1, k_vals=k_vals, l_vals=l_vals)
+        self.add_term(var, C*self.model.ddr_ccb0, k_vals=k_vals, l_vals=l_vals)
 
     def add_dth(self, var, C=1, k_vals=None, l_vals=None):
         self.add_term(var, C*self.model.ddth_lp1, ldiff=+1, k_vals=k_vals, l_vals=l_vals)

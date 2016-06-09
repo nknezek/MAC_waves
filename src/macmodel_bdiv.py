@@ -53,7 +53,7 @@ class Model(macmodel.Model):
         self.tmom.add_d2th_r('ur', C= E)
         self.tmom.add_d2th_ph('uph', C= E)
 
-        self.tmom.add_dr_ccb('bth', C= E/Pm*Br)
+        self.tmom.add_dr_ccb0('bth', C= E/Pm*Br)
         # self.tmom.add_dr('br', C= -E/Pm*Bth)
         # self.tmom.add_dth('bth', C= E/Pm*Bth)
         self.tmom.add_dth('br', C= -E/Pm*Br)
@@ -75,7 +75,7 @@ class Model(macmodel.Model):
         self.pmom.add_d2ph_r('ur', C= E)
         self.pmom.add_d2ph_th('uth', C= E)
 
-        self.pmom.add_dr_ccb('bph', C= E/Pm*Br)
+        self.pmom.add_dr_ccb0('bph', C= E/Pm*Br)
         # self.pmom.add_dr('br', C= -E/Pm*Bph)
         # self.pmom.add_dth('bph', C= E/Pm*Bth)
         # self.pmom.add_dth('bth', C= E/Pm*Bph)
