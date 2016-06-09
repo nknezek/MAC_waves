@@ -234,9 +234,9 @@ class Model():
     def set_buoy_by_type(self, buoy_type, buoy_ratio):
         self.omega_g0 = buoy_ratio*self.Omega
         if buoy_type == 'constant':
-            self.omega_g = np.ones((self.Nk, self.Nl+2))*self.omega_g0
+            self.omega_g = np.ones((self.Nk, self.Nl))*self.omega_g0
         elif buoy_type == 'linear':
-            self.omega_g = (np.ones((self.Nk, self.Nl+2)).T*np.linspace(0, self.omega_g0, self.Nk)).T
+            self.omega_g = (np.ones((self.Nk, self.Nl)).T*np.linspace(0, self.omega_g0, self.Nk)).T
         self.N = self.omega_g**2*self.t_star**2
 
     def get_index(self, k, l, var):
@@ -288,7 +288,7 @@ class Model():
             variable = np.array(np.reshape(vector[var_start:var_end], (Nk, Nl), 'F'))
             return variable
 
-    def create_vector(self, variables, boundaries):
+    def create_vector(self, variables):
         '''
         Takes a set of variables and boundaries and creates a vector out of
         them.
@@ -306,8 +306,6 @@ class Model():
         # Check Inputs:
         if len(variables) != len(self.model_variables):
             raise RuntimeError('Incorrect number of variable vectors passed')
-        if len(boundaries) != len(self.boundary_variables):
-            raise RuntimeError('Incorrect number of boundary vectors passed')
         for var in variables:
             vector = np.vstack((vector, np.reshape(var, (Nk*Nl, 1))))
         return np.array(vector[1:])
