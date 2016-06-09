@@ -140,8 +140,7 @@ for cnum, c in enumerate(combinations):
                 bc0 = np.ones((2,model.Nl))*1e-16
                 v0 = np.ones((model.Nk, model.Nl))*1e-16
                 variables = [v_eq_s, v_eq_a, v_eq_s*1j, v_eq_a, v_eq_a*1j, v_eq_s, v_eq_s*1j, v_eq_s*1j]
-                boundaries = [bc0, bc0, bc0, bc0, bc0, bc0, bc0]
-                start_vec = model.create_vector(variables, boundaries)
+                start_vec = model.create_vector(variables)
                 mplt.plot_pcolormesh_rth(model, '-1', start_vec, dir_name=out_dir, title='initial guess', physical_units=True)
                 logger.info('created initial guess')
         except:
