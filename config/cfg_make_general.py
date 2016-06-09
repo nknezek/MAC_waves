@@ -51,5 +51,5 @@ buoy_ratio =  [1.0]
 # model parameters
 model_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p', 'r_disp')
 boundary_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p')
-dir_suf = '_strongbc'
+dir_suf = '_strongbc2'
 ep = 1e-3
