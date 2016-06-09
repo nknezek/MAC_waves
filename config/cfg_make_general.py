@@ -9,8 +9,8 @@ import pickle as pkl
 m = [0]
 
 # Size of grid
-Nk = 4 # Radial cells
-Nl = 4 # Latitudinal cells
+Nk = 20 # Radial cells
+Nl = 200 # Latitudinal cells
 
 # Define Physical Constants
 R = 3480e3  # Outer core radius in (m)
