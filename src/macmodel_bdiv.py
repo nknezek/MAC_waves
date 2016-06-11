@@ -119,7 +119,7 @@ class Model(macmodel.Model):
 
         # phi-Lorentz
         self.add_gov_equation('phlorentz', 'bph')
-        self.phlorentz.add_dr_ccbd0('uph', C= Br)
+        self.phlorentz.add_dr_bd0('uph', C= Br)
         # self.phlorentz.add_dr('ur', C= -Bph)
         # self.phlorentz.add_dth('uph', C= Bth)
         # self.phlorentz.add_dth('uth', C= -Bph)
@@ -135,7 +135,7 @@ class Model(macmodel.Model):
 
         # Divergence (Mass Conservation) #########
         self.add_gov_equation('div', 'p')
-        self.div.add_dr_ccb0('ur')
+        self.div.add_dr_b0('ur')
         self.div.add_dth('uth')
         self.div.add_dph('uph')
         self.A_rows += self.div.rows
