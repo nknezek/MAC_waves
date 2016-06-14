@@ -27,11 +27,9 @@ class Model(macmodel.Model):
         self.rmom.add_drP('p', C= -1)
         self.rmom.add_term('r_disp', -N**2)
         # self.rmom.add_term('uph', 2.0*sin(th))
-
         self.rmom.add_d2_b0('ur', C= E)
         self.rmom.add_d2r_th('uth', C= E)
         self.rmom.add_d2r_ph('uph', C= E)
-
         # self.rmom.add_dr('br', C= E/Pm*Br)
         # self.rmom.add_dr('bth', C= -E/Pm*Bth)
         # self.rmom.add_dr('bph', C= -E/Pm*Bph)
@@ -48,11 +46,9 @@ class Model(macmodel.Model):
         self.add_gov_equation('tmom', 'uth')
         self.tmom.add_dthP('p', C= -1)
         self.tmom.add_term('uph', 2.0*cos(th))
-
         self.tmom.add_d2_bd0('uth', C= E)
         self.tmom.add_d2th_r('ur', C= E)
         self.tmom.add_d2th_ph('uph', C= E)
-
         self.tmom.add_dr_ccb0('bth', C= E/Pm*Br)
         # self.tmom.add_dr('br', C= -E/Pm*Bth)
         # self.tmom.add_dth('bth', C= E/Pm*Bth)
@@ -70,11 +66,9 @@ class Model(macmodel.Model):
         self.pmom.add_dphP('p', C= -1)
         self.pmom.add_term('uth', -2.0*cos(th))
         # self.pmom.add_term('ur', 2.0*sin(th))
-
         self.pmom.add_d2_bd0('uph', C= E)
         self.pmom.add_d2ph_r('ur', C= E)
         self.pmom.add_d2ph_th('uth', C= E)
-
         self.pmom.add_dr_ccb0('bph', C= E/Pm*Br)
         # self.pmom.add_dr('br', C= -E/Pm*Bph)
         # self.pmom.add_dth('bph', C= E/Pm*Bth)
@@ -107,11 +101,9 @@ class Model(macmodel.Model):
         # self.thlorentz.add_dr('ur', C= -Bth)
         # self.thlorentz.add_dph('uth', C= Bph)
         # self.thlorentz.add_dph('uph', C= -Bth)
-
         self.thlorentz.add_d2_ccb0('bth', C= E/Pm)
         self.thlorentz.add_d2th_r('br', C= E/Pm)
         self.thlorentz.add_d2th_ph('bph', C= E/Pm)
-
         self.A_rows += self.thlorentz.rows
         self.A_cols += self.thlorentz.cols
         self.A_vals += self.thlorentz.vals
@@ -123,11 +115,9 @@ class Model(macmodel.Model):
         # self.phlorentz.add_dr('ur', C= -Bph)
         # self.phlorentz.add_dth('uph', C= Bth)
         # self.phlorentz.add_dth('uth', C= -Bph)
-
         self.phlorentz.add_d2_ccb0('bph', C= E/Pm)
         self.phlorentz.add_d2ph_r('br', C= E/Pm)
         self.phlorentz.add_d2ph_th('bth', C= E/Pm)
-
         self.A_rows += self.phlorentz.rows
         self.A_cols += self.phlorentz.cols
         self.A_vals += self.phlorentz.vals

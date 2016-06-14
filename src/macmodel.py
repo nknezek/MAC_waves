@@ -498,7 +498,7 @@ class Model():
         self.ddr_km1_ccb0 = np.array(self.ddr_km1_b0)
         self.ddr_km1_ccb0[0,:] = np.zeros(Nl)
         self.ddr_ccb0 = np.array(self.ddr_b0)
-        self.ddr_ccb0 = rp[0,:]**2/(r[0,:]**2*2*dr)
+        self.ddr_ccb0[0,:] = rp[0,:]**2/(r[0,:]**2*2*dr)
         self.ddr_u_ccb0 = -rm[0,:]**2/(r[0,:]**2*dr)
 
         # ddth
