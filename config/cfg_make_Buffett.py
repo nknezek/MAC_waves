@@ -38,7 +38,7 @@ const = 0.0
 Bmax = 0.0
 Bmin = 0.0
 sin_exp = 0.0
-Bnoise = 0.3e-3
+Bnoise = 0.0
 
 # background velocity field in (m/s)
 Uphi = np.ones((Nk, Nl))*0.0
