@@ -28,7 +28,6 @@ dCyr = [68.44627]
 # background magnetic field in (Tesla)
 # chocies: dipole, dipoleBr, absDipole, absDipoleBr, constantBr, set, sinfuncBr
 B_type = 'absDipoleBr'
-#Brdat = pkl.load(open('Br_long_avg200.p','rb'))
 
 B_mag = [0.31e-3]
 Bd = B_mag
@@ -41,7 +40,7 @@ sin_exp = 0.0
 Bnoise = 0.3e-3
 
 # background velocity field in (m/s)
-Uphi = np.ones((Nk+2, Nl))*0.0
+Uphi = np.ones((Nk, Nl))*0.0
 
 # Buoyancy Frequency
 # choices: constant, linear
@@ -51,5 +50,5 @@ buoy_ratio =  [1.0]
 # model parameters
 model_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p', 'r_disp')
 boundary_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p')
-dir_suf = '_bdiv'
+dir_suf = '_strongbc3'
 ep = 1e-3

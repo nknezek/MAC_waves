@@ -29,7 +29,6 @@ rho = cfg.rho
 mu_0 = cfg.mu_0
 g = cfg.g
 model_variables = cfg.model_variables
-boundary_variables = cfg.boundary_variables
 dir_suf = cfg.dir_suf
 ep = cfg.ep
 
@@ -80,8 +79,7 @@ for c in combinations:
     physical_constants = {'R': R, 'Omega': Omega, 'rho': rho,
                           'h': h, 'nu': nu, 'eta': eta,
                           'mu_0': mu_0, 'g': g}
-    model = mac.Model(model_variables, boundary_variables,
-                      model_parameters, physical_constants)
+    model = mac.Model(model_variables, model_parameters, physical_constants)
     model.set_B_by_type(B_type=B_type, Bd=Bd, Br=Br, Bth=Bth, const=const, Bmax=Bmax, Bmin=Bmin, sin_exp=sin_exp, noise=Bnoise)
     model.set_buoy_by_type(buoy_type=buoy_type, buoy_ratio=buoy_ratio)
     if type(dCyr) == (float or int):
@@ -127,8 +125,7 @@ for c in combinations:
     'Uph = ' + str(model.Uphi.max()) + ' to ' + str(model.Uphi.min()) + '\n' +
     'buoy_type = ' + str(buoy_type) + '\n' +
     'buoy_ratio = ' + str(buoy_ratio) +'\n' +
-    'model variables = ' + str(model.model_variables) + '\n' +
-    'boundary variables = ' + str(model.boundary_variables)
+    'model variables = ' + str(model.model_variables) + '\n'
     )
     print('model will be saved in ' + str(dir_name))
 
@@ -140,7 +137,6 @@ for c in combinations:
 #    print('created D3sq matrix')
 #    model.make_dthMat()
 #    print('created dth matrix')
-
 
     #%% Save Model Information
     #==============================================================================

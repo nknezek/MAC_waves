@@ -3,7 +3,6 @@
 import macloglib as mlog
 import macplotlib as mplt
 import mac_analysis as mana
-
 import pickle as pkl
 import numpy as np
 import itertools as it
@@ -11,7 +10,6 @@ from datetime import datetime
 import sys
 import importlib
 import shutil
-
 import slepc4py
 slepc4py.init(sys.argv)
 from petsc4py import PETSc
@@ -140,8 +138,7 @@ for cnum, c in enumerate(combinations):
                 bc0 = np.ones((2,model.Nl))*1e-16
                 v0 = np.ones((model.Nk, model.Nl))*1e-16
                 variables = [v_eq_s, v_eq_a, v_eq_s*1j, v_eq_a, v_eq_a*1j, v_eq_s, v_eq_s*1j, v_eq_s*1j]
-                boundaries = [bc0, bc0, bc0, bc0, bc0, bc0, bc0]
-                start_vec = model.create_vector(variables, boundaries)
+                start_vec = model.create_vector(variables)
                 mplt.plot_pcolormesh_rth(model, '-1', start_vec, dir_name=out_dir, title='initial guess', physical_units=True)
                 logger.info('created initial guess')
         except:
@@ -209,17 +206,9 @@ for cnum, c in enumerate(combinations):
             fvals, fvecs = mana.filter_by_equator_power(model, vals, vecs, equator_fraction=eq_split, var=eq_var)
             logger.info('\t{0} filtered eigenvalues to plot with power at equator, split={1:.1f}'.format(len(fvals), eq_split))
 
-            # Filter by dth
-            # fvals, fvecs = mana.filter_by_dth(model, fvals, fvecs, dth_filter)
-            # logger.info('\t{0} filtered eigenvalues to plot with max dth < {1:.1e}'.format(len(fvals), dth_filter))
-
-            # Filter by Second Derivative
-            # fvals, fvecs = mana.filter_by_d2(model, fvals, fvecs, d2_filter)
-            # logger.info('\t{0} filtered eigenvalues to plot with max d2 < {1:.1e}'.format(len(fvals), d2_filter))
-
             # %% Filter by number of zeros in theta-direction
-            # fvals, fvecs = mana.filter_by_theta_zeros(model, fvals, fvecs, cfg.zeros_wanted)
-            # logger.info('\t{0} eigenvectors found with requested number of zeros'.format(len(fvecs)))
+            fvals, fvecs = mana.filter_by_theta_zeros(model, fvals, fvecs, cfg.zeros_wanted)
+            logger.info('\t{0} eigenvectors found with requested number of zeros'.format(len(fvecs)))
 
             # %% Filter by Quality Factor
             fvals, fvecs = mana.filter_by_Q(model, fvals, fvecs, cfg.min_Q)
