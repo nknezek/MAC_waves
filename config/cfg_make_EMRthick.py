@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 import numpy as np
-import macmodel_rlor as mac
+import macmodel_rlor_noCC as mac
 import macloglib as mlog
 import pickle as pkl
 
@@ -23,7 +23,7 @@ eta = 0.8  # magnetic diffusivity in (m^2/s)
 eta_th = 0.0
 mu_0 = 4.*np.pi*10.**-7  # vacuum permeability in (kg*m/(A^2s^2))
 g = 10.  # Gravity in m/s^2
-dCyr = [20.]
+dCyr = [120.]
 
 # background magnetic field in (Tesla)
 # chocies: dipole, dipoleBr, absDipole, absDipoleBr, constantBr, set, sinfuncBr
@@ -50,5 +50,5 @@ buoy_ratio =  [4.]
 # model parameters
 model_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p', 'r_disp')
 boundary_variables = ('ur', 'uth', 'uph', 'br', 'bth', 'bph', 'p')
-dir_suf = '_EMRTrlor'
+dir_suf = '_EMRT_rlor_noCC'
 ep = 1e-3

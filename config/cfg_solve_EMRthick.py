@@ -2,7 +2,7 @@
 import numpy as np
 """ Configuration File for SLEPc Run solving MAC model """
 
-T_list = [100.]
+T_list = [120.]
 delta_T = 120.
 
 nev = 3
@@ -28,7 +28,7 @@ tol = 1e-3
 
 dCyr_list = [120.]
 data_dir = [
-    '../data/k20_l200_m6_nu1e+02_135km_constantN400_constantBrB62_EMRTrlor/',
+    '../data/k20_l200_m6_nu1e+02_135km_constantN400_constantBrB62_EMRT_rlor_noCC/',
     # '../data/k20_l200_m6_nu1e+02_135km_constantN400_constantBrB62_EMRTrlor/',
     # '../data/k20_l200_m6_nu1e+02_135km_constantN400_constantBrB62_EMRthick/',
     # '../data/k20_l200_m6_nu1e-02_135km_constantN400_constantBrB62_EMRthick/',
