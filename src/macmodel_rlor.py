@@ -30,7 +30,7 @@ class Model(macmodel.Model):
         self.rmom.add_d2_b0('ur', C= E)
         self.rmom.add_d2r_th('uth', C= E)
         self.rmom.add_d2r_ph('uph', C= E)
-        # self.rmom.add_dr_b0('br', C= E/Pm*Br)
+        # self.rmom.add_dr_bd0('br', C= E/Pm*Br)
         # self.rmom.add_dr_ccb0('bth', C= -E/Pm*Bth)
         # self.rmom.add_dr_ccb0('bph', C= -E/Pm*Bph)
         # self.rmom.add_dth('br', C= E/Pm*Bth)
@@ -85,15 +85,19 @@ class Model(macmodel.Model):
         # Lorentz Equation ##########
         ################################
 
-        # B-divergence replaces r-lorentz
-        self.add_gov_equation('bdiv', 'br')
-        self.bdiv.add_dr_bd0('br')
-        self.bdiv.add_dth('bth')
-        self.bdiv.add_dph('bph')
-        self.A_rows += self.bdiv.rows
-        self.A_cols += self.bdiv.cols
-        self.A_vals += self.bdiv.vals
-        del self.bdiv
+        # r-Lorentz
+        self.add_gov_equation('rlorentz', 'br')
+        # self.rlorentz.add_dth('ur', C= Bth)
+        self.rlorentz.add_dth('uth', C= -Br)
+        # self.rlorentz.add_dph('ur', C= Bph)
+        self.rlorentz.add_dph('uph', C= -Br)
+        self.rlorentz.add_d2_bd0('br', C= E/Pm)
+        self.rlorentz.add_d2r_th('bth', C= E/Pm)
+        self.rlorentz.add_d2r_ph('bph', C= E/Pm)
+        self.A_rows += self.rlorentz.rows
+        self.A_cols += self.rlorentz.cols
+        self.A_vals += self.rlorentz.vals
+        del self.rlorentz
 
         # theta-Lorentz
         self.add_gov_equation('thlorentz', 'bth')
@@ -169,6 +173,13 @@ class Model(macmodel.Model):
         self.B_cols += self.B_uph.cols
         self.B_vals += self.B_uph.vals
         del self.B_uph
+
+        self.add_gov_equation('B_rlorentz', 'br')
+        self.B_rlorentz.add_term('br', ones)
+        self.B_rows += self.B_rlorentz.rows
+        self.B_cols += self.B_rlorentz.cols
+        self.B_vals += self.B_rlorentz.vals
+        del self.B_rlorentz
 
         self.add_gov_equation('B_thlorentz', 'bth')
         self.B_thlorentz.add_term('bth', ones)

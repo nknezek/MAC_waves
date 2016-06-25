@@ -19,36 +19,36 @@ def apply_dth(model, vec):
 
 def get_max_d2_norm(model, vec, var=None):
     if var:
-        d2_var = model.get_variable(apply_d2(vec), var, returnBC=False)
-        var_out = model.get_variable(vec, var, returnBC=False)
+        d2_var = model.get_variable(apply_d2(vec), var)
+        var_out = model.get_variable(vec, var)
         return abs(d2_var).max()/abs(var_out).max()
     else:
         maxes = []
         d2_vec = apply_d2(model, vec)
         for var in model.model_variables:
-            d2_var = model.get_variable(d2_vec, var, returnBC=False)
-            var_out = model.get_variable(vec, var, returnBC=False)
+            d2_var = model.get_variable(d2_vec, var)
+            var_out = model.get_variable(vec, var)
             maxes.append(abs(d2_var).max()/abs(var_out).max())
     return max(maxes)
 
 
 def get_max_dth_norm(model, vec, var=None):
     if var:
-        dth_var = model.get_variable(apply_dth(vec), var, returnBC=False)
-        var_out = model.get_variable(vec, var, returnBC=False)
+        dth_var = model.get_variable(apply_dth(vec), var)
+        var_out = model.get_variable(vec, var)
         return abs(dth_var).max()/abs(var_out).max()
     else:
         maxes = []
         dth_vec = apply_dth(model, vec)
         for var in model.model_variables:
-            dth_var = model.get_variable(dth_vec, var, returnBC=False)
-            var_out = model.get_variable(vec, var, returnBC=False)
+            dth_var = model.get_variable(dth_vec, var)
+            var_out = model.get_variable(vec, var)
             maxes.append(abs(dth_var).max()/abs(var_out).max())
     return max(maxes)
 
 
 def get_equator_power_excess(model, vec, var='ur', split=0.5):
-    var_out = model.get_variable(vec, var, returnBC=False)
+    var_out = model.get_variable(vec, var)
     var_noneq_power = abs(np.concatenate((var_out[:, :(model.Nl-1)*(0.5-split/2.)],
                                          var_out[:, (model.Nl-1)*(0.5+split/2.):]),
                                          axis=1)).sum()
@@ -63,7 +63,7 @@ def shift_longitude(model, vec, phi):
 def shift_vec_real(model, vec, var='ur'):
     ''' shift given vector's phase so that given variable (default ur) is
     dominantly real'''
-    v = model.get_variable(vec, var, returnBC=False)
+    v = model.get_variable(vec, var)
     angs = np.angle(v) % np.pi
     abs_v = np.abs(v)
     avg_ang = np.average(angs, weights=abs_v) # shift phase angle
@@ -79,20 +79,26 @@ def shift_vec_real(model, vec, var='ur'):
         return vec*np.exp(-1j*avg_ang)
 
 def get_theta_zero_crossings(model, vec, var='uth'):
-    uth = model.get_variable(vec, var, returnBC=False)
-    signs = np.sign(np.diff(np.mean(np.abs(uth), axis=0)))
+    z = model.get_variable(vec, var)
+    ind = np.argmax(np.mean(np.abs(z),axis=1))
+    signs = np.sign(z[ind,:])
     return np.where(signs[1:] != signs[:-1])[0]
 
 def get_Q(model, val):
     return abs(val.imag/(2*val.real))
 
-def filter_by_theta_zeros(model, vals, vecs, zeros_wanted, val='uth'):
+def filter_by_theta_zeros(model, vals, vecs, zeros_wanted, var='uth', verbose=False):
     if type(zeros_wanted) is not list:
-        zeros_wanted = [zeros_wanted]
+        zeros_wanted = list(zeros_wanted)
+    if verbose:
+        print('zeros wanted: {0}'.format(zeros_wanted))
     filtered_vals = []
     filtered_vecs = []
-    for (val, vec) in zip(vals, vecs):
-        if len(get_theta_zero_crossings(model, vec))-1 in zeros_wanted:
+    for ind,(val, vec) in enumerate(zip(vals, vecs)):
+        zc = get_theta_zero_crossings(model, vec, var=var)
+        if verbose:
+            print("{0}: val= {1}, zc = {2}".format(ind, val, zc))
+        if len(zc)-1 in zeros_wanted:
             filtered_vals.append(val)
             filtered_vecs.append(vec)
     return filtered_vals, filtered_vecs

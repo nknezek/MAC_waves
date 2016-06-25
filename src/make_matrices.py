@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-import sys
+import sys, os
 import macplotlib as mplt
 import itertools as it
 import numpy as np
@@ -10,7 +10,7 @@ import importlib
 default_config = "cfg_make_general"
 sys.path.append('../config')
 try:
-    config_file = sys.argv[1].rstrip('\.py')
+    config_file = os.path.splitext(sys.argv[1])[0]
     cfg = importlib.import_module(config_file)
     print("used config file from command line {0}".format(config_file))
 except:

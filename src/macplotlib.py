@@ -193,13 +193,13 @@ def plot_pcolormesh_rth(model,val,vec,dir_name='./',title='pcolormesh MAC Wave P
     thpl = model.th*180./np.pi
     fig = plt.figure(figsize=(14,14))
     fig.suptitle(title, fontsize=14)
-    gs = gridspec.GridSpec(8, 2, width_ratios=[100, 1])
+    gs = gridspec.GridSpec(len(model.model_variables), 2, width_ratios=[100, 1])
     axes = []
     gs_data_list = []
     for ind, var in enumerate(model.model_variables):
         gs_data_list.append(gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[ind*2], wspace=0.01))
         try:
-            var_data = model.get_variable(vec, var, returnBC=False)
+            var_data = model.get_variable(vec, var)
             if oscillate_values:
                 var_data[:,::2] = var_data[:,::2]*-1
             axes.append(plt.subplot(gs_data_list[ind][0]))
@@ -247,19 +247,19 @@ def plot_vel_AGU(model,vec,dir_name='./',title='Velocity for AGU', physical_unit
     u_star = model.u_star
     rpl = model.r*r_star/1e3
     thpl = model.th*180./np.pi
-    ur = model.get_variable(vec, 'ur', returnBC=False)*u_star
+    ur = model.get_variable(vec, 'ur')*u_star
     ur[:,::2] = ur[:,::2]*-1
     urmax = np.amax(abs(ur))
-    uth = model.get_variable(vec, 'uth', returnBC=False)*u_star
+    uth = model.get_variable(vec, 'uth')*u_star
     uth[:,::2] = uth[:,::2]*-1
     uthmax = np.amax(abs(uth))
-    uph = model.get_variable(vec, 'uph', returnBC=False)*u_star
+    uph = model.get_variable(vec, 'uph')*u_star
     uph[:,::2] = uph[:,::2]*-1
     uphmax = np.amax(abs(uph))
-    bth = model.get_variable(vec, 'bth', returnBC=False)*B_star
+    bth = model.get_variable(vec, 'bth')*B_star
     bth[:,::2] = bth[:,::2]*-1
     bthmax = np.amax(abs(bth))
-    bph = model.get_variable(vec, 'bph', returnBC=False)*B_star
+    bph = model.get_variable(vec, 'bph')*B_star
     bph[:,::2] = bph[:,::2]*-1
     bphmax = np.amax(abs(bph))
 

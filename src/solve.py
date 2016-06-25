@@ -7,7 +7,7 @@ import pickle as pkl
 import numpy as np
 import itertools as it
 from datetime import datetime
-import sys
+import sys, os
 import importlib
 import shutil
 import slepc4py
@@ -20,7 +20,7 @@ opts = PETSc.Options()
 default_config = "cfg_solve_general"
 sys.path.append('../config')
 try:
-    config_file = sys.argv[1].rstrip('\.py')
+    config_file = os.path.splitext(sys.argv[1])[0]
     cfg = importlib.import_module(config_file)
     print("used config file from command line {0}".format(config_file))
 except:
@@ -247,7 +247,7 @@ for cnum, c in enumerate(combinations):
                 Decay = (2*np.pi/val.real)*model.t_star/(24.*3600.*365.25)
                 Q = abs(val.imag/(2*val.real))
                 if abs(Period) < 1.0:
-                    title = ('T{1:.2f}_Q{2:.2f}_{0:.0f}'.format(ind, Period*365.25, Q))
+                    title = ('T{1:.2f}dys_Q{2:.2f}_{0:.0f}'.format(ind, Period*365.25, Q))
                 else:
                     title = ('T{1:.2f}yrs_Q{2:.2f}_{0:.0f}'.format(ind, Period, Q))
                 if plot_vel:
@@ -256,7 +256,7 @@ for cnum, c in enumerate(combinations):
                     mplt.plot_robinson(model, vec, model.m, oscillate=oscillate, dir_name=out_dir_T, title=str(ind)+'_T{0:.2f}yrs_'.format(Period)+'Divergence')
                 if plot_B_obs:
                     mplt.plot_B_obs(model, vec, model.m, oscillate=oscillate, dir_name=out_dir_T, title=title+'_Bperturb')
-                logger.info('\t plotted ind={0}, T={1:.2f}yrs'.format(ind, Period))
+                logger.info('\t plotted ind={0}, T={1:.2f}yrs (eig={2:.2e})'.format(ind, Period, val))
             logger.info('run complete')
         except:
             logger.error("Problem Plotting Eigenvalues.", exc_info=1)

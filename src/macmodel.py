@@ -69,6 +69,7 @@ class Model():
             self.BrT = np.ones((self.Nk, self.Nl))*BrT
             self.Br = self.BrT/self.B_star
         elif isinstance(BrT, np.ndarray) and BrT.shape == (self.Nk, self.Nl):
+            self.BrT = BrT
             self.Br = self.BrT/self.B_star
         else:
             raise TypeError("BrT must either be an int, float, or np.ndarray of correct size")
@@ -80,6 +81,7 @@ class Model():
             self.BthT = np.ones((self.Nk, self.Nl))*BthT
             self.Bth = self.BthT/self.B_star
         elif isinstance(BthT, np.ndarray) and BthT.shape == (self.Nk, self.Nl) :
+            self.BthT = BthT
             self.Bth = self.BthT/self.B_star
         else:
             raise TypeError("BthT must either be an int, float, or np.ndarray of correct size")
@@ -91,6 +93,7 @@ class Model():
             self.BphT = np.ones((self.Nk, self.Nl))*BphT
             self.Bph = self.BphT/self.B_star
         elif isinstance(BphT, np.ndarray) and BphT.shape ==(self.Nk, self.Nl):
+            self.BphT = BphT
             self.Bph = self.BphT/self.B_star
         else:
             raise TypeError("BphT must either be an int, float, or np.ndarray of correct size")
@@ -261,7 +264,7 @@ class Model():
             raise RuntimeError('k index out of bounds')
         return Size_var*self.model_variables.index(var) + k + l*Nk
 
-    def get_variable(self, vector, var, returnBC=True):
+    def get_variable(self, vector, var):
         '''
         Takes a flat vector and a variable name, returns the variable in a
         np.matrix
@@ -443,7 +446,7 @@ class Model():
         self.Brobs = BrobsT/self.B_star
         gradBrobsT = -2*np.ones((self.Nk, self.Nl))*sin(self.th)/self.R
         self.gradBrobs = gradBrobsT/self.B_star*self.r_star
-        self.add_gov_equation('Bobs', 'ur')
+        self.add_gov_equation('Bobs', self.model_variables[0])
         self.Bobs.add_term('uth', self.gradBrobs)
         self.Bobs.add_dth('uth', C= self.Brobs)
         self.Bobs.add_dph('uph', C= self.Brobs)
